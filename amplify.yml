@@ -1,14 +1,12 @@
 version: 1
 backend:
   phases:
-    preBuild:
-      commands:
-        # Build the Lambda bundle before CDK synth so Code.fromAsset finds the artifact
-        - cd lambda && npm ci && npm run build && cd ..
     build:
       commands:
+        - cd lambda && npm ci && npm run build && cd ..
         - npm ci --cache .npm --prefer-offline
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - npx cdk bootstrap
+        - npx cdk deploy TexasCityApiStack --require-approval never
 frontend:
   phases:
     preBuild:
