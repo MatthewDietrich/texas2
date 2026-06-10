@@ -11,8 +11,6 @@ class TexasCityApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    const corsOrigin = process.env.CORS_ORIGIN ?? '*'
-
     const apiHandler = new lambda.Function(this, 'TexasCityApiHandler', {
       runtime:    lambda.Runtime.NODEJS_20_X,
       handler:    'handler.handler',
@@ -22,14 +20,21 @@ class TexasCityApiStack extends Stack {
       environment: {
         MONGODB_URI: process.env.MONGODB_URI ?? '',
         MONGODB_DB:  process.env.MONGODB_DB  ?? 'texas',
-        CORS_ORIGIN: corsOrigin,
       },
     })
 
+    // Allowed origins: Amplify production URL + localhost for dev.
+    // Set AMPLIFY_APP_URL in the Amplify Console environment variables.
+    const allowedOrigins = [
+      process.env.AMPLIFY_APP_URL ?? '',
+      'http://localhost:5173',
+    ].filter(Boolean)
+
+    // CORS is owned entirely here — the Lambda itself sets no Access-Control-* headers.
     const fnUrl = apiHandler.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
       cors: {
-        allowedOrigins: [corsOrigin],
+        allowedOrigins,
         allowedMethods: [lambda.HttpMethod.GET, lambda.HttpMethod.POST],
         allowedHeaders: ['Content-Type'],
         maxAge: Duration.days(1),

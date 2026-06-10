@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 import type { Route, RouteContext } from './types'
-import { noContent, notFound, serverError } from './response'
+import { notFound, serverError } from './response'
 import { listCities, getCity, getTopSearched, recordSearch } from './routes/cities'
 import { getCamera, getCamerasForCity, recordView } from './routes/cameras'
 import { refreshDistrict } from './routes/districts'
@@ -31,10 +31,8 @@ export const handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
   const method = event.requestContext.http.method.toUpperCase()
   const path   = event.rawPath.replace(/^\/api/, '') // strip /api prefix if API Gateway adds one
-  const origin = process.env.CORS_ORIGIN ?? '*'
 
-  // Handle CORS preflight
-  if (method === 'OPTIONS') return noContent(origin)
+  // OPTIONS preflight is handled by the Lambda Function URL — it never reaches here
 
   // Match route
   for (const route of ROUTES) {
@@ -51,18 +49,18 @@ export const handler = async (
       params,
       query:  (event.queryStringParameters ?? {}) as Record<string, string>,
       body:   parseBody(event),
-      origin,
+      origin: '',
     }
 
     try {
       return await route.handler(ctx)
     } catch (err) {
       console.error(`[${method} ${path}]`, err)
-      return serverError('Internal server error', origin)
+      return serverError('Internal server error')
     }
   }
 
-  return notFound(`No route for ${method} ${path}`, origin)
+  return notFound(`No route for ${method} ${path}`)
 }
 
 function parseBody(event: APIGatewayProxyEventV2): unknown {
