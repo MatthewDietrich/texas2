@@ -4,48 +4,67 @@ import { ok, notFound, badRequest } from '../response'
 
 /** GET /cities — full name list for autocomplete */
 export const listCities: RouteHandler = async ({ origin }) => {
-  const db = await getDb()
-  const names = await db
+  const db   = await getDb()
+  const docs = await db
     .collection('cities')
-    .find({}, { projection: { name: 1, _id: 0 } })
-    .sort({ name: 1 })
+    .find({}, { projection: { 'properties.name': 1, _id: 0 } })
+    .sort({ 'properties.name': 1 })
     .toArray()
-  return ok(names.map((d) => d.name), origin)
+  return ok(docs.map(d => d.properties.name), origin)
 }
 
 /** GET /cities/:name — full city document */
 export const getCity: RouteHandler = async ({ params, origin }) => {
-  const db = await getDb()
+  const db   = await getDb()
   const city = await db.collection('cities').findOne(
-    { name: params.name },
+    { 'properties.name': params.name },
     { projection: { _id: 0 } },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
   return ok(city, origin)
 }
 
-/** GET /searches/top?limit=100 — most-searched cities */
+/** GET /searches/top?limit=100 — most-searched cities, sorted by timesSearched desc */
 export const getTopSearched: RouteHandler = async ({ query, origin }) => {
   const limit = Math.min(Number(query.limit ?? 100), 500)
-  const db = await getDb()
-  const cities = await db
+  const db    = await getDb()
+  const docs  = await db
     .collection('cities')
-    .find({}, { projection: { name: 1, searchCount: 1, _id: 0 } })
-    .sort({ searchCount: -1 })
+    .find({}, { projection: { 'properties.name': 1, timesSearched: 1, _id: 0 } })
+    .sort({ timesSearched: -1 })
     .limit(limit)
     .toArray()
-  return ok(cities, origin)
+  return ok(docs.map(d => ({ name: d.properties.name, timesSearched: d.timesSearched })), origin)
 }
 
-/** POST /cities/:name/search — increment searchCount and return updated count */
+/** GET /searches/recent?limit=10 — most recently searched cities, sorted by lastSearched desc */
+export const getRecentSearched: RouteHandler = async ({ query, origin }) => {
+  const limit = Math.min(Number(query.limit ?? 10), 50)
+  const db    = await getDb()
+  const docs  = await db
+    .collection('cities')
+    .find(
+      { lastSearched: { $exists: true, $ne: null } },
+      { projection: { 'properties.name': 1, lastSearched: 1, _id: 0 } },
+    )
+    .sort({ lastSearched: -1 })
+    .limit(limit)
+    .toArray()
+  return ok(docs.map(d => ({ name: d.properties.name, lastSearched: d.lastSearched })), origin)
+}
+
+/** POST /cities/:name/search — increment timesSearched and stamp lastSearched */
 export const recordSearch: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
-  const db = await getDb()
+  const db     = await getDb()
   const result = await db.collection('cities').findOneAndUpdate(
-    { name: params.name },
-    { $inc: { searchCount: 1 } },
-    { returnDocument: 'after', projection: { name: 1, searchCount: 1, _id: 0 } },
+    { 'properties.name': params.name },
+    {
+      $inc: { timesSearched: 1 },
+      $set: { lastSearched: new Date().toISOString() },
+    },
+    { returnDocument: 'after', projection: { 'properties.name': 1, timesSearched: 1, _id: 0 } },
   )
   if (!result) return notFound(`No city found with name "${params.name}"`, origin)
-  return ok(result, origin)
+  return ok({ name: result.properties.name, timesSearched: result.timesSearched }, origin)
 }

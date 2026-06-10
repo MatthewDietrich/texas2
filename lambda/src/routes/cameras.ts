@@ -31,7 +31,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
 
   const db   = await getDb()
   const city = await db.collection('cities').findOne(
-    { name: params.name },
+    { 'properties.name': params.name },
     { projection: { lat: 1, lon: 1, _id: 0 } },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)

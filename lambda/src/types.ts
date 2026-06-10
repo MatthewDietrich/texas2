@@ -19,14 +19,17 @@ export interface Route {
 // ── MongoDB document shapes ──────────────────────────────────────────────────
 
 export interface CityDoc {
-  name:        string
-  county:      string
-  state:       string
-  lat:         number
-  lon:         number
-  population:  number
-  searchCount: number
-  nearby:      string[]
+  properties: {
+    name: string
+  }
+  county:        string
+  state:         string
+  lat:           number
+  lon:           number
+  population:    number
+  timesSearched: number
+  lastSearched:  string | null
+  nearby:        string[]
 }
 
 export interface CameraDoc {

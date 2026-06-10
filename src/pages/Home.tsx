@@ -1,21 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import texasMap from '../assets/texas.png'
 import { useFetch } from '../hooks/useFetch'
-import { getCityNames, getTopSearched } from '../api/cities'
+import { getCityNames, getTopSearched, getRecentSearched } from '../api/cities'
 
 export default function Home() {
   const navigate = useNavigate()
   const inputRef  = useRef<HTMLInputElement>(null)
 
-  const { data: cityNames }   = useFetch(getCityNames)
-  const { data: topSearched } = useFetch(() => getTopSearched(5))
-
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-  useEffect(() => {
-    setRecentSearches(JSON.parse(localStorage.getItem('recentSearches') ?? '[]') as string[])
-  }, [])
+  const { data: cityNames }     = useFetch(getCityNames)
+  const { data: topSearched }   = useFetch(() => getTopSearched(5))
+  const { data: recentSearched } = useFetch(() => getRecentSearched(10))
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -77,10 +73,10 @@ export default function Home() {
             <div>
               <h2 className="h5">Recently Searched</h2>
               <ol>
-                {recentSearches.length > 0
-                  ? recentSearches.map(name => (
-                      <li key={name}>
-                        <Link to={`/city/${encodeURIComponent(name)}`}>{name}</Link>
+                {recentSearched && recentSearched.length > 0
+                  ? recentSearched.map(c => (
+                      <li key={c.name}>
+                        <Link to={`/city/${encodeURIComponent(c.name)}`}>{c.name}</Link>
                       </li>
                     ))
                   : <li><em>No recent searches</em></li>

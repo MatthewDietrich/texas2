@@ -33,13 +33,9 @@ export default function City() {
   const { data: city,    loading: cityLoading,    error: cityError    } = useFetch(() => getCity(cityName!),            [cityName])
   const { data: cameras, loading: camsLoading,    error: camsError    } = useFetch(() => getCamerasForCity(cityName!),  [cityName])
 
-  // Record search + update recently-searched in localStorage
+  // Record search — Lambda stamps lastSearched which drives the recent searches list
   useEffect(() => {
-    if (!cityName) return
-    recordSearch(cityName).catch(() => {})
-    const prev    = JSON.parse(localStorage.getItem('recentSearches') ?? '[]') as string[]
-    const updated = [cityName, ...prev.filter(c => c !== cityName)].slice(0, 5)
-    localStorage.setItem('recentSearches', JSON.stringify(updated))
+    if (cityName) recordSearch(cityName).catch(() => {})
   }, [cityName])
 
   return (
@@ -221,7 +217,7 @@ export default function City() {
                 </span>
               ))}
             </p>
-            <p className="mb-2">Searched {city.searchCount.toLocaleString()} times</p>
+            <p className="mb-2">Searched {city.timesSearched.toLocaleString()} times</p>
           </>
         )}
       </Footer>

@@ -28,7 +28,7 @@ export default function MostSearched() {
   }
 
   // API returns sorted by searchCount desc — derive rank from that original order
-  const ranked = cities?.map((c, i) => ({ rank: i + 1, name: c.name, count: c.searchCount })) ?? []
+  const ranked = cities?.map((c, i) => ({ rank: i + 1, name: c.name, count: c.timesSearched })) ?? []
 
   const sorted = [...ranked].sort((a, b) => {
     const av = a[sortKey === 'count' ? 'count' : sortKey]

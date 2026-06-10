@@ -1,22 +1,31 @@
 import { get, post } from './client'
 
 export interface City {
-  name:        string
-  county:      string
-  state:       string
-  lat:         number
-  lon:         number
-  population:  number
-  searchCount: number
-  nearby:      string[]
+  properties: {
+    name: string
+  }
+  county:        string
+  state:         string
+  lat:           number
+  lon:           number
+  population:    number
+  timesSearched: number
+  lastSearched:  string | null
+  nearby:        string[]
 }
 
 export interface SearchedCity {
-  name:        string
-  searchCount: number
+  name:          string
+  timesSearched: number
 }
 
-export const getCityNames   = ()                   => get<string[]>('/cities')
-export const getCity        = (name: string)       => get<City>(`/cities/${encodeURIComponent(name)}`)
-export const getTopSearched = (limit = 100)        => get<SearchedCity[]>(`/searches/top?limit=${limit}`)
-export const recordSearch   = (name: string)       => post<{ name: string; searchCount: number }>(`/cities/${encodeURIComponent(name)}/search`)
+export interface RecentCity {
+  name:         string
+  lastSearched: string
+}
+
+export const getCityNames      = ()                   => get<string[]>('/cities')
+export const getCity           = (name: string)       => get<City>(`/cities/${encodeURIComponent(name)}`)
+export const getTopSearched    = (limit = 100)        => get<SearchedCity[]>(`/searches/top?limit=${limit}`)
+export const getRecentSearched = (limit = 10)         => get<RecentCity[]>(`/searches/recent?limit=${limit}`)
+export const recordSearch      = (name: string)       => post<{ name: string; timesSearched: number }>(`/cities/${encodeURIComponent(name)}/search`)
