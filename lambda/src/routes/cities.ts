@@ -18,7 +18,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const db   = await getDb()
   const city = await db.collection('cities').findOne(
     { 'properties.name': params.name },
-    { projection: { _id: 0 } },
+    { projection: { _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
   return ok(city, origin)
@@ -63,7 +63,7 @@ export const recordSearch: RouteHandler = async ({ params, origin }) => {
       $inc: { timesSearched: 1 },
       $set: { lastSearched: new Date().toISOString() },
     },
-    { returnDocument: 'after', projection: { 'properties.name': 1, timesSearched: 1, _id: 0 } },
+    { returnDocument: 'after', projection: { 'properties.name': 1, timesSearched: 1, _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
   if (!result) return notFound(`No city found with name "${params.name}"`, origin)
   return ok({ name: result.properties.name, timesSearched: result.timesSearched }, origin)

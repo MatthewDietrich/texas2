@@ -32,19 +32,15 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   const db   = await getDb()
   const city = await db.collection('cities').findOne(
     { 'properties.name': params.name },
-    { projection: { lat: 1, lon: 1, _id: 0 } },
+    { projection: { geometry: 1, _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
 
+  // Use $geoWithin so we get cameras on roads that pass through the city boundary.
+  // Requires a 2dsphere index on cameras.location:
+  //   db.cameras.createIndex({ location: '2dsphere' })
   const cameras = await db.collection('cameras').find(
-    {
-      location: {
-        $near: {
-          $geometry: { type: 'Point', coordinates: [city.lon, city.lat] },
-          $maxDistance: 50_000,  // 50 km radius
-        },
-      },
-    },
+    { location: { $geoWithin: { $geometry: city.geometry } } },
     { projection: { _id: 0 } },
   )
     .limit(8)
