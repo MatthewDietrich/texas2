@@ -1,6 +1,8 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
+import { MongoTopologyClosedError } from 'mongodb'
 import type { Route, RouteContext } from './types'
 import { notFound, serverError } from './response'
+import { resetClient } from './db'
 import { listCities, getCity, getTopSearched, recordSearch } from './routes/cities'
 import { getCamera, getCamerasForCity, recordView } from './routes/cameras'
 import { refreshDistrict } from './routes/districts'
@@ -55,7 +57,17 @@ export const handler = async (
     try {
       return await route.handler(ctx)
     } catch (err) {
-      console.error(`[${method} ${path}]`, err)
+      if (err instanceof MongoTopologyClosedError) {
+        console.warn(`[${method} ${path}] topology closed — resetting connection and retrying`)
+        resetClient()
+        try {
+          return await route.handler(ctx)
+        } catch (retryErr) {
+          console.error(`[${method} ${path}] retry failed`, retryErr)
+        }
+      } else {
+        console.error(`[${method} ${path}]`, err)
+      }
       return serverError('Internal server error')
     }
   }

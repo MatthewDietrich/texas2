@@ -14,3 +14,10 @@ export async function getDb(): Promise<Db> {
   }
   return client.db(process.env.MONGODB_DB ?? 'texas')
 }
+
+// Called by the handler when a MongoTopologyClosedError is caught so the next
+// request gets a fresh connection instead of reusing a dead one.
+export function resetClient(): void {
+  client?.close().catch(() => {})
+  client = null
+}
