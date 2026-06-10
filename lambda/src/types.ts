@@ -30,12 +30,14 @@ export interface CityDoc {
 }
 
 export interface CameraDoc {
-  icdId:        string
-  lat:          number
-  lon:          number
-  nearestCity:  string
-  county:       string
-  viewCount:    number
-  snapshotTime: string
-  snapshot:     string  // base64-encoded PNG
+  icdId:                string
+  direction:            string
+  location: {
+    type:        'Point'
+    coordinates: [number, number]  // [longitude, latitude] — GeoJSON order
+  }
+  hasSnapshot:          boolean
+  districtAbbreviation: string
+  timesViewed:          number
+  lastViewed:           string | null
 }

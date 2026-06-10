@@ -3,6 +3,7 @@ import type { Route, RouteContext } from './types'
 import { noContent, notFound, serverError } from './response'
 import { listCities, getCity, getTopSearched, recordSearch } from './routes/cities'
 import { getCamera, getCamerasForCity, recordView } from './routes/cameras'
+import { refreshDistrict } from './routes/districts'
 
 // ── Route table ──────────────────────────────────────────────────────────────
 // Pattern groups become named params (keys array must match group order).
@@ -19,6 +20,8 @@ const ROUTES: Route[] = [
   { method: 'POST', pattern: /^\/cities\/([^/]+)\/search$/,    keys: ['name'], handler: recordSearch },
   // Cameras — writes
   { method: 'POST', pattern: /^\/cameras\/([^/]+)\/view$/,     keys: ['id'],   handler: recordView },
+  // Districts — writes
+  { method: 'POST', pattern: /^\/districts\/([^/]+)\/refresh$/, keys: ['code'], handler: refreshDistrict },
 ]
 
 // ── Handler ──────────────────────────────────────────────────────────────────

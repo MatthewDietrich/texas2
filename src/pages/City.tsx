@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
-
-const CAMERAS = Array.from({ length: 8 }, (_, i) => ({ id: `ICD-${1000 + i}`, index: i }))
+import { useFetch } from '../hooks/useFetch'
+import { getCity, recordSearch } from '../api/cities'
+import { getCamerasForCity } from '../api/cameras'
 
 const HOURLY = Array.from({ length: 12 }, (_, i) => ({
   hour: `${(8 + i) % 24}:00`,
@@ -11,12 +13,12 @@ const HOURLY = Array.from({ length: 12 }, (_, i) => ({
 }))
 
 const FORECAST = [
-  { day: 'Mon', condition: 'Sunny', high: 85, low: 68, precip: '5%' },
+  { day: 'Mon', condition: 'Sunny',         high: 85, low: 68, precip: '5%' },
   { day: 'Tue', condition: 'Partly Cloudy', high: 80, low: 65, precip: '20%' },
-  { day: 'Wed', condition: 'Rainy', high: 74, low: 60, precip: '80%' },
-  { day: 'Thu', condition: 'Cloudy', high: 76, low: 62, precip: '40%' },
-  { day: 'Fri', condition: 'Sunny', high: 82, low: 66, precip: '5%' },
-  { day: 'Sat', condition: 'Sunny', high: 87, low: 70, precip: '5%' },
+  { day: 'Wed', condition: 'Rainy',         high: 74, low: 60, precip: '80%' },
+  { day: 'Thu', condition: 'Cloudy',        high: 76, low: 62, precip: '40%' },
+  { day: 'Fri', condition: 'Sunny',         high: 82, low: 66, precip: '5%' },
+  { day: 'Sat', condition: 'Sunny',         high: 87, low: 70, precip: '5%' },
   { day: 'Sun', condition: 'Partly Cloudy', high: 84, low: 67, precip: '15%' },
 ]
 
@@ -25,23 +27,20 @@ const ALMANAC_ROWS = [
   'Avg. Cloud Cover', 'Avg. Wind', 'Pressure', 'Sunrise', 'Sunset',
 ]
 
-const RESERVOIRS = [
-  'Lake Travis (near Austin) — 62% full',
-  'Lake Buchanan (near Burnet) — 71% full',
-  'Canyon Lake (near New Braunfels) — 58% full',
-]
-
-const HIGHWAYS = ['I-35', 'US-183', 'TX-71', 'TX-130']
-
-const AIRPORTS = [
-  { name: 'Austin-Bergstrom International', code: 'AUS', city: 'Austin' },
-  { name: 'Austin Executive Airport', code: 'EDC', city: 'Austin' },
-]
-
-const NEARBY = ['Round Rock', 'Cedar Park', 'Pflugerville']
-
 export default function City() {
   const { cityName } = useParams<{ cityName: string }>()
+
+  const { data: city,    loading: cityLoading,    error: cityError    } = useFetch(() => getCity(cityName!),            [cityName])
+  const { data: cameras, loading: camsLoading,    error: camsError    } = useFetch(() => getCamerasForCity(cityName!),  [cityName])
+
+  // Record search + update recently-searched in localStorage
+  useEffect(() => {
+    if (!cityName) return
+    recordSearch(cityName).catch(() => {})
+    const prev    = JSON.parse(localStorage.getItem('recentSearches') ?? '[]') as string[]
+    const updated = [cityName, ...prev.filter(c => c !== cityName)].slice(0, 5)
+    localStorage.setItem('recentSearches', JSON.stringify(updated))
+  }, [cityName])
 
   return (
     <div className="container-fluid d-flex flex-column">
@@ -50,9 +49,15 @@ export default function City() {
       <main className="p-4">
         <header className="text-center mb-4">
           <h1 className="display-1">{cityName}</h1>
-          <p>Travis County, Texas</p>
-          <p>30.2672° N, 97.7431° W</p>
-          <p>Population: —</p>
+          {cityLoading && <p>Loading…</p>}
+          {cityError   && <p className="text-danger">{cityError}</p>}
+          {city && (
+            <>
+              <p>{city.county}, {city.state}</p>
+              <p>{city.lat}° N, {Math.abs(city.lon)}° W</p>
+              <p>Population: {city.population.toLocaleString()}</p>
+            </>
+          )}
         </header>
 
         <div className="tab-container">
@@ -63,28 +68,29 @@ export default function City() {
 
           <div className="tab-header">
             <label htmlFor="tab1">
-              <span className="material-symbols-outlined">photo_camera</span>
-              {' '}Snapshots
+              <span className="material-symbols-outlined">photo_camera</span>{' '}Snapshots
             </label>
             <label htmlFor="tab2">
-              <span className="material-symbols-outlined">cloud</span>
-              {' '}Weather
+              <span className="material-symbols-outlined">cloud</span>{' '}Weather
             </label>
             <label htmlFor="tab3">
-              <span className="material-symbols-outlined">water_drop</span>
-              {' '}Water
+              <span className="material-symbols-outlined">water_drop</span>{' '}Water
             </label>
             <label htmlFor="tab4">
-              <span className="material-symbols-outlined">directions_car</span>
-              {' '}Transportation
+              <span className="material-symbols-outlined">directions_car</span>{' '}Transportation
             </label>
           </div>
 
           {/* Tab 1: Snapshots */}
           <div className="tab-content content1" id="snapshots-container">
+            {camsLoading && <p>Loading cameras…</p>}
+            {camsError   && <p className="text-danger">{camsError}</p>}
+            {!camsLoading && !camsError && cameras?.length === 0 && (
+              <p>No cameras found near this city.</p>
+            )}
             <div className="row" id="snapshots">
-              {CAMERAS.map((cam) => (
-                <div key={cam.id} className="col-sm-6 mb-3">
+              {cameras?.map((cam, i) => (
+                <div key={cam.icdId} className="col-sm-6 mb-3">
                   <div className="img-container">
                     <div
                       style={{
@@ -96,10 +102,12 @@ export default function City() {
                         justifyContent: 'center',
                       }}
                     >
-                      <span>Camera {cam.index + 1}</span>
+                      <span>Camera {i + 1}</span>
                     </div>
                     <div className="img-caption">
-                      <Link to={`/camera/${cam.id}`} className="icdId">{cam.id}</Link>
+                      <Link to={`/camera/${encodeURIComponent(cam.icdId)}`} className="icdId">
+                        {cam.icdId}
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -112,10 +120,9 @@ export default function City() {
             </small>
           </div>
 
-          {/* Tab 2: Weather */}
+          {/* Tab 2: Weather (placeholder — requires external API integration) */}
           <div className="tab-content content2" id="weather-container">
             <p className="text-center mb-3"><em>No active weather alerts</em></p>
-
             <div className="row">
               <div className="col-12 mb-4" id="weather">
                 <h2 className="h4">Current Conditions</h2>
@@ -126,79 +133,55 @@ export default function City() {
                   </div>
                   <table className="table table-bordered">
                     <tbody>
-                      <tr><th>Temperature</th><td>82°F</td></tr>
-                      <tr><th>Feels Like</th><td>85°F</td></tr>
-                      <tr><th>Humidity</th><td>45%</td></tr>
-                      <tr><th>Precipitation Chance</th><td>5%</td></tr>
-                      <tr><th>Cloud Cover</th><td>10%</td></tr>
-                      <tr><th>Wind</th><td>12 mph S</td></tr>
-                      <tr><th>Pressure</th><td>30.1 inHg</td></tr>
+                      <tr><th>Temperature</th><td>—</td></tr>
+                      <tr><th>Feels Like</th><td>—</td></tr>
+                      <tr><th>Humidity</th><td>—</td></tr>
+                      <tr><th>Precipitation Chance</th><td>—</td></tr>
+                      <tr><th>Cloud Cover</th><td>—</td></tr>
+                      <tr><th>Wind</th><td>—</td></tr>
+                      <tr><th>Pressure</th><td>—</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-
               <div className="col-12 mb-4" id="forecast">
                 <h2 className="h4">Next 12 Hours</h2>
                 <div style={{ overflowX: 'auto' }}>
                   <table className="table table-bordered text-center">
-                    <thead>
-                      <tr>{HOURLY.map((h) => <th key={h.hour}>{h.hour}</th>)}</tr>
-                    </thead>
+                    <thead><tr>{HOURLY.map(h => <th key={h.hour}>{h.hour}</th>)}</tr></thead>
                     <tbody>
-                      <tr>{HOURLY.map((h) => <td key={h.hour}>☀️</td>)}</tr>
-                      <tr>{HOURLY.map((h) => <td key={h.hour}>{h.temp}</td>)}</tr>
-                      <tr>{HOURLY.map((h) => <td key={h.hour}>{h.precip}</td>)}</tr>
+                      <tr>{HOURLY.map(h => <td key={h.hour}>—</td>)}</tr>
+                      <tr>{HOURLY.map(h => <td key={h.hour}>—</td>)}</tr>
+                      <tr>{HOURLY.map(h => <td key={h.hour}>—</td>)}</tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-
               <div className="col-12 col-lg-6 mb-4">
                 <h2 className="h4">7-Day Forecast</h2>
                 <table className="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Day</th><th>Condition</th><th>High</th><th>Low</th><th>Precip.</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>Day</th><th>Condition</th><th>High</th><th>Low</th><th>Precip.</th></tr></thead>
                   <tbody>
-                    {FORECAST.map((f) => (
+                    {FORECAST.map(f => (
                       <tr key={f.day}>
-                        <td>{f.day}</td>
-                        <td>{f.condition}</td>
-                        <td>{f.high}°F</td>
-                        <td>{f.low}°F</td>
-                        <td>{f.precip}</td>
+                        <td>{f.day}</td><td>—</td><td>—</td><td>—</td><td>—</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
               <div className="col-12 col-lg-6 mb-4">
                 <h2 className="h4">Historical Comparison</h2>
                 <table className="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>1 Year Ago</th>
-                      <th>5 Years Ago</th>
-                      <th>10 Years Ago</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th></th><th>1 Year Ago</th><th>5 Years Ago</th><th>10 Years Ago</th></tr></thead>
                   <tbody>
-                    {ALMANAC_ROWS.map((row) => (
-                      <tr key={row}>
-                        <th>{row}</th>
-                        <td>—</td><td>—</td><td>—</td>
-                      </tr>
+                    {ALMANAC_ROWS.map(row => (
+                      <tr key={row}><th>{row}</th><td>—</td><td>—</td><td>—</td></tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             </div>
-
             <small>
               Forecasts by{' '}
               <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>.
@@ -207,12 +190,10 @@ export default function City() {
             </small>
           </div>
 
-          {/* Tab 3: Water */}
+          {/* Tab 3: Water (placeholder) */}
           <div className="tab-content content3" id="water-container">
             <h2 className="h4 mb-3">Reservoirs near {cityName}</h2>
-            <ul>
-              {RESERVOIRS.map((r) => <li key={r}>{r}</li>)}
-            </ul>
+            <p><em>Water data coming soon.</em></p>
             <small className="d-block mt-3">
               Source:{' '}
               <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">
@@ -221,39 +202,28 @@ export default function City() {
             </small>
           </div>
 
-          {/* Tab 4: Transportation */}
+          {/* Tab 4: Transportation (placeholder) */}
           <div className="tab-content content4" id="transportation-container">
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <h2 className="h4 mb-2">Highways</h2>
-                <ul>
-                  {HIGHWAYS.map((h) => <li key={h}>{h}</li>)}
-                </ul>
-              </div>
-              <div className="col-md-6 mb-3">
-                <h2 className="h4 mb-2">Airports</h2>
-                <ul>
-                  {AIRPORTS.map((a) => (
-                    <li key={a.code}>{a.name} ({a.code}) — {a.city}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <p><em>Transportation data coming soon.</em></p>
           </div>
         </div>
       </main>
 
       <Footer>
-        <p className="mb-2">
-          Nearby:{' '}
-          {NEARBY.map((city, i) => (
-            <span key={city}>
-              {i > 0 && ', '}
-              <Link to={`/city/${city}`}>{city}</Link>
-            </span>
-          ))}
-        </p>
-        <p className="mb-2">Searched — times</p>
+        {city && (
+          <>
+            <p className="mb-2">
+              Nearby:{' '}
+              {city.nearby.map((name, i) => (
+                <span key={name}>
+                  {i > 0 && ', '}
+                  <Link to={`/city/${encodeURIComponent(name)}`}>{name}</Link>
+                </span>
+              ))}
+            </p>
+            <p className="mb-2">Searched {city.searchCount.toLocaleString()} times</p>
+          </>
+        )}
       </Footer>
     </div>
   )
