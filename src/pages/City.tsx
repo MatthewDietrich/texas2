@@ -27,6 +27,8 @@ const ALMANAC_ROWS = [
   'Avg. Cloud Cover', 'Avg. Wind', 'Pressure', 'Sunrise', 'Sunset',
 ]
 
+const COORDINATE_PRECISION = 7
+
 export default function City() {
   const { cityName } = useParams<{ cityName: string }>()
 
@@ -50,7 +52,7 @@ export default function City() {
           {city && (
             <>
               <p>{city.county}, {city.state}</p>
-              <p>{city.properties.intptlat}° N, {Math.abs(parseFloat(city.properties.intptlon))}° W</p>
+              <p>{parseFloat(city.properties.intptlat).toFixed(COORDINATE_PRECISION)}° N, {Math.abs(parseFloat(city.properties.intptlon)).toFixed(COORDINATE_PRECISION)}° W</p>
               <p>Population: {city.population.toLocaleString()}</p>
             </>
           )}

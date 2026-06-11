@@ -3,6 +3,8 @@ import { getDb } from '../db'
 import { ok, notFound, badRequest } from '../response'
 import { getCctvSnapshot } from '../txdot'
 
+const NUM_CAMERAS = 8
+
 /** GET /cameras/:id — camera metadata + live snapshot from TxDOT */
 export const getCamera: RouteHandler = async ({ params, origin }) => {
   const db     = await getDb()
@@ -20,12 +22,7 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
   return ok({ ...camera, snapshot }, origin)
 }
 
-/**
- * GET /cities/:name/cameras — cameras near a city using a geospatial $near query.
- *
- * Requires a 2dsphere index on the cameras collection:
- *   db.cameras.createIndex({ location: '2dsphere' })
- */
+/** GET /cities/:name/cameras — cameras near a city using a $geoNear query */
 export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
 
@@ -36,14 +33,11 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
 
-  // Use $geoWithin so we get cameras on roads that pass through the city boundary.
-  // Requires a 2dsphere index on cameras.location:
-  //   db.cameras.createIndex({ location: '2dsphere' })
   const cameras = await db.collection('cameras').find(
-    { location: { $geoWithin: { $geometry: city.geometry } } },
+    { location: { $geoNear: { $geometry: city.geometry } } },
     { projection: { _id: 0 } },
   )
-    .limit(8)
+    .limit(NUM_CAMERAS)
     .toArray()
 
   return ok(cameras, origin)
