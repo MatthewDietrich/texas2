@@ -30,7 +30,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
 
   const db   = await getDb()
-  const city = await db.collection('cities').findOne(
+  const city = await db.collection('city').findOne(
     { 'properties.name': params.name },
     { projection: { geometry: 1, _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
