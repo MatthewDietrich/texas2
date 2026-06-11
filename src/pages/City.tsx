@@ -210,7 +210,7 @@ export default function City() {
           <>
             <p className="mb-2">
               Nearby:{' '}
-              {city.nearby.map((name, i) => (
+              {(city.nearby ?? []).map((name, i) => (
                 <span key={name}>
                   {i > 0 && ', '}
                   <Link to={`/city/${encodeURIComponent(name)}`}>{name}</Link>

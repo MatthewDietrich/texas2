@@ -21,7 +21,24 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
     { projection: { _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
-  return ok(city, origin)
+
+  const lat = parseFloat(city.properties.intptlat)
+  const lon = parseFloat(city.properties.intptlon)
+  const nearbyDocs = await db.collection('city').aggregate([
+    {
+      $geoNear: {
+        near:          { type: 'Point', coordinates: [lon, lat] },
+        distanceField: 'dist',
+        spherical:     true,
+        key:           'geometry',
+        query:         { 'properties.name': { $ne: city.properties.name } },
+      },
+    },
+    { $limit: 3 },
+    { $project: { 'properties.name': 1, _id: 0 } },
+  ]).toArray()
+
+  return ok({ ...city, nearby: nearbyDocs.map((d: any) => d.properties.name) }, origin)
 }
 
 /** GET /searches/top?limit=100 — most-searched cities, sorted by timesSearched desc */

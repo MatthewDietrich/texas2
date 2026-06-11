@@ -11,7 +11,7 @@ export interface City {
   population:    number
   timesSearched: number
   lastSearched:  string | null
-  nearby:        string[]
+  nearby?:       string[]
 }
 
 export interface SearchedCity {
