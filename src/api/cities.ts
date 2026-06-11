@@ -3,6 +3,8 @@ import { get, post } from './client'
 export interface City {
   properties: {
     name: string
+    intptlat: string
+    intptlon: string
   }
   county:        string
   state:         string

@@ -50,7 +50,7 @@ export default function City() {
           {city && (
             <>
               <p>{city.county}, {city.state}</p>
-              <p>{city.lat}° N, {Math.abs(city.lon)}° W</p>
+              <p>{city.properties.intptlat}° N, {Math.abs(parseFloat(city.properties.intptlon))}° W</p>
               <p>Population: {city.population.toLocaleString()}</p>
             </>
           )}

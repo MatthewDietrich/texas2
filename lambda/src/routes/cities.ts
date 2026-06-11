@@ -62,7 +62,7 @@ export const getRecentSearched: RouteHandler = async ({ query, origin }) => {
     .collection('city')
     .find(
       { lastSearched: { $exists: true, $ne: null } },
-      { projection: { 'properties.name': 1, lastSearched: 1, _id: 0 } },
+      { projection: { 'properties.name': 1, 'properties.intptlat': 1, 'properties.intptlon': 1, lastSearched: 1, _id: 0 } },
     )
     .sort({ lastSearched: -1 })
     .limit(limit)
