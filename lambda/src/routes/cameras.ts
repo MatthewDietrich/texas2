@@ -8,7 +8,7 @@ const NUM_CAMERAS = 8
 /** GET /cameras/:id — camera metadata + live snapshot from TxDOT */
 export const getCamera: RouteHandler = async ({ params, origin }) => {
   const db     = await getDb()
-  const camera = await db.collection('cameras').findOne(
+  const camera = await db.collection('camera').findOne(
     { icdId: params.id },
     { projection: { _id: 0 } },
   )
@@ -41,7 +41,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat)
   const lon = parseFloat(city.properties.intptlon)
 
-  const cameras = await db.collection('cameras').aggregate([
+  const cameras = await db.collection('camera').aggregate([
     {
       $geoNear: {
         near:          { type: 'Point', coordinates: [lon, lat] },
@@ -62,7 +62,7 @@ export const recordView: RouteHandler = async ({ params, origin }) => {
   if (!params.id) return badRequest('Camera id is required', origin)
 
   const db     = await getDb()
-  const result = await db.collection('cameras').findOneAndUpdate(
+  const result = await db.collection('camera').findOneAndUpdate(
     { icdId: params.id },
     {
       $inc: { timesViewed: 1 },
