@@ -4,7 +4,13 @@ import { ok, notFound, badRequest } from '../response'
 import { getCctvSnapshot } from '../txdot'
 import { Collections } from '../collections'
 
-const NUM_CAMERAS = 8
+const NUM_CAMERAS    = 8
+const SNAPSHOT_TTL_MS = 5 * 60 * 1000
+
+function isCacheFresh(cam: { snapshot?: string | null; snapshotCachedAt?: string | null }): boolean {
+  return !!cam.snapshot && !!cam.snapshotCachedAt &&
+    Date.now() - new Date(cam.snapshotCachedAt).getTime() < SNAPSHOT_TTL_MS
+}
 
 /** GET /cameras/:id — camera metadata + live snapshot from TxDOT */
 export const getCamera: RouteHandler = async ({ params, origin }) => {
@@ -15,12 +21,18 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
   )
   if (!camera) return notFound(`No camera found with id "${params.id}"`, origin)
 
-  let snapshot: string | null = null
-  if (camera.hasSnapshot) {
+  let snapshot: string | null = camera.snapshot ?? null
+  if (camera.hasSnapshot && !isCacheFresh(camera)) {
     snapshot = await getCctvSnapshot(camera.icdId, camera.districtAbbreviation).catch(err => {
       console.error(`[snapshot] ${camera.icdId}:`, err)
       return null
     })
+    if (snapshot) {
+      await db.collection(Collections.camera).updateOne(
+        { icdId: camera.icdId },
+        { $set: { snapshot, snapshotCachedAt: new Date().toISOString() } },
+      )
+    }
   }
 
   return ok({ ...camera, snapshot }, origin)
@@ -59,13 +71,26 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   ]).toArray()
 
   const snapshots = await Promise.all(
-    cameras.map(cam => cam.hasSnapshot
-      ? getCctvSnapshot(cam.icdId, cam.districtAbbreviation).catch(err => {
-          console.error(`[snapshot] ${cam.icdId}:`, err)
-          return null
-        })
-      : null
-    )
+    cameras.map(cam => {
+      if (!cam.hasSnapshot) return null
+      if (isCacheFresh(cam)) return cam.snapshot as string
+      return getCctvSnapshot(cam.icdId, cam.districtAbbreviation).catch(err => {
+        console.error(`[snapshot] ${cam.icdId}:`, err)
+        return null
+      })
+    })
+  )
+
+  // Persist newly fetched snapshots back to the camera documents
+  await Promise.all(
+    cameras.flatMap((cam, i) => {
+      const snapshot = snapshots[i]
+      if (!snapshot || snapshot === cam.snapshot) return []
+      return [db.collection(Collections.camera).updateOne(
+        { icdId: cam.icdId },
+        { $set: { snapshot, snapshotCachedAt: new Date().toISOString() } },
+      )]
+    })
   )
 
   return ok(cameras.map((cam, i) => ({ ...cam, snapshot: snapshots[i] })), origin)
