@@ -11,6 +11,12 @@ export interface TxDotCameraStatus {
   hasSnapshot: boolean
 }
 
+export interface TxDotCameraSnapshot {
+  icd_Id: string
+  snippet: string
+  timestampFormatted: string
+}
+
 // ── API calls ────────────────────────────────────────────────────────────────
 
 export async function getCctvListByDistrict(districtCode: string): Promise<TxDotCameraStatus[]> {
@@ -22,7 +28,7 @@ export async function getCctvListByDistrict(districtCode: string): Promise<TxDot
   return res.json() as Promise<TxDotCameraStatus[]>
 }
 
-// Returns the snapshot image as a base64 string.
+// Returns the snapshot as a base64 string.
 // TxDOT caches snapshots server-side for ~5 minutes.
 export async function getCctvSnapshot(icdId: string, districtCode: string): Promise<string> {
   const url = `${DISTRICT_BASE}/GetCctvSnapshotByIcdId?icdId=${encodeURIComponent(icdId)}&districtCode=${encodeURIComponent(districtCode)}`
@@ -30,6 +36,6 @@ export async function getCctvSnapshot(icdId: string, districtCode: string): Prom
   if (!res.ok) {
     throw new Error(`TxDOT snapshot API ${res.status} for "${icdId}"`)
   }
-  const buffer = await res.arrayBuffer()
-  return Buffer.from(buffer).toString('base64')
+  const data = await res.json() as TxDotCameraSnapshot
+  return data.snippet
 }
