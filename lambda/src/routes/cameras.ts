@@ -55,7 +55,11 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
     { $project: { _id: 0, dist: 0 } },
   ]).toArray()
 
-  return ok(cameras, origin)
+  const snapshots = await Promise.all(
+    cameras.map(cam => cam.hasSnapshot ? getCctvSnapshot(cam.icdId).catch(() => null) : null)
+  )
+
+  return ok(cameras.map((cam, i) => ({ ...cam, snapshot: snapshots[i] })), origin)
 }
 
 /** POST /cameras/:id/view — increment timesViewed and stamp lastViewed */
