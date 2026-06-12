@@ -17,7 +17,7 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
 
   let snapshot: string | null = null
   if (camera.hasSnapshot) {
-    snapshot = await getCctvSnapshot(camera.icdId).catch(() => null)
+    snapshot = await getCctvSnapshot(camera.icdId, camera.districtAbbreviation).catch(() => null)
   }
 
   return ok({ ...camera, snapshot }, origin)
@@ -56,7 +56,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   ]).toArray()
 
   const snapshots = await Promise.all(
-    cameras.map(cam => cam.hasSnapshot ? getCctvSnapshot(cam.icdId).catch(() => null) : null)
+    cameras.map(cam => cam.hasSnapshot ? getCctvSnapshot(cam.icdId, cam.districtAbbreviation).catch(() => null) : null)
   )
 
   return ok(cameras.map((cam, i) => ({ ...cam, snapshot: snapshots[i] })), origin)

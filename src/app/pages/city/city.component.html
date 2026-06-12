@@ -39,7 +39,7 @@
                 @if (cam.snapshot) {
                   <img [src]="'data:image/jpeg;base64,' + cam.snapshot" [alt]="cam.icdId" style="width:100%" />
                 } @else {
-                  <img src="unavailable.png" />
+                  <img src="/unavailable.png" alt="Snapshot unavailable" style="width:100%" />
                 }
                 <div class="img-caption">
                   <a [routerLink]="['/camera', cam.icdId]" class="icdId">{{ cam.icdId }}</a>
