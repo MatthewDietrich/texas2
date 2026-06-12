@@ -1,0 +1,39 @@
+<header>
+  @if (variant() === 'home') {
+    <nav class="d-flex align-items-center p-2">
+      <span class="fw-bold">Texas City Snapshot</span>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a routerLink="/mostsearched" aria-label="Leaderboard">
+          <span class="material-symbols-outlined">leaderboard</span>
+        </a>
+        <details>
+          <summary><span class="material-symbols-outlined">palette</span></summary>
+          <ul>
+            @for (t of themes; track t.value) {
+              <li><button (click)="themeService.setTheme(t.value)">{{ t.label }}</button></li>
+            }
+          </ul>
+        </details>
+      </div>
+    </nav>
+  } @else {
+    <nav class="d-flex align-items-center p-2">
+      <button class="btn p-0" (click)="goBack()" aria-label="Go back">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <a routerLink="/" class="ms-2" aria-label="Home">
+        <span class="material-symbols-outlined">home</span>
+      </a>
+      <div class="ms-auto">
+        <details>
+          <summary><span class="material-symbols-outlined">palette</span></summary>
+          <ul>
+            @for (t of themes; track t.value) {
+              <li><button (click)="themeService.setTheme(t.value)">{{ t.label }}</button></li>
+            }
+          </ul>
+        </details>
+      </div>
+    </nav>
+  }
+</header>

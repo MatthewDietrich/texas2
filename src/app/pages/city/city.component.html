@@ -1,0 +1,144 @@
+<div class="container-fluid d-flex flex-column">
+  <app-nav-bar />
+
+  <main class="p-4">
+    <header class="text-center mb-4">
+      <h1 class="display-1">{{ cityName() }}</h1>
+      @if (cityLoading()) { <p>Loading…</p> }
+      @if (cityError()) { <p class="text-danger">{{ cityError() }}</p> }
+      @if (city(); as c) {
+        <p>{{ c.county }}, {{ c.state }}</p>
+        <p>{{ lat() }}° N, {{ lon() }}° W</p>
+        <p>Population: {{ c.population.toLocaleString() }}</p>
+      }
+    </header>
+
+    <div class="tab-container">
+      <input type="radio" id="tab1" name="city-tabs" checked>
+      <input type="radio" id="tab2" name="city-tabs">
+      <input type="radio" id="tab3" name="city-tabs">
+      <input type="radio" id="tab4" name="city-tabs">
+
+      <div class="tab-header">
+        <label for="tab1"><span class="material-symbols-outlined">photo_camera</span> Snapshots</label>
+        <label for="tab2"><span class="material-symbols-outlined">cloud</span> Weather</label>
+        <label for="tab3"><span class="material-symbols-outlined">water_drop</span> Water</label>
+        <label for="tab4"><span class="material-symbols-outlined">directions_car</span> Transportation</label>
+      </div>
+
+      <div class="tab-content content1" id="snapshots-container">
+        @if (camsLoading()) { <p>Loading cameras…</p> }
+        @if (camsError()) { <p class="text-danger">{{ camsError() }}</p> }
+        @if (!camsLoading() && !camsError() && cameras()?.length === 0) {
+          <p>No cameras found near this city.</p>
+        }
+        <div class="row" id="snapshots">
+          @for (cam of cameras() ?? []; track cam.icdId; let i = $index) {
+            <div class="col-sm-6 mb-3">
+              <div class="img-container">
+                <div style="width:100%;height:150px;background:var(--secondary-bg);display:flex;align-items:center;justify-content:center">
+                  <span>Camera {{ i + 1 }}</span>
+                </div>
+                <div class="img-caption">
+                  <a [routerLink]="['/camera', cam.icdId]" class="icdId">{{ cam.icdId }}</a>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <small>
+          <a href="https://txdot.gov" target="_blank" rel="noreferrer">Texas DOT live traffic cameras</a>
+        </small>
+      </div>
+
+      <div class="tab-content content2" id="weather-container">
+        <p class="text-center mb-3"><em>No active weather alerts</em></p>
+        <div class="row">
+          <div class="col-12 mb-4" id="weather">
+            <h2 class="h4">Current Conditions</h2>
+            <div class="d-flex align-items-start gap-4 pt-2">
+              <div class="text-center">
+                <span style="font-size:3rem">☀️</span>
+                <p>Sunny</p>
+              </div>
+              <table class="table table-bordered">
+                <tbody>
+                  <tr><th>Temperature</th><td>—</td></tr>
+                  <tr><th>Feels Like</th><td>—</td></tr>
+                  <tr><th>Humidity</th><td>—</td></tr>
+                  <tr><th>Precipitation Chance</th><td>—</td></tr>
+                  <tr><th>Cloud Cover</th><td>—</td></tr>
+                  <tr><th>Wind</th><td>—</td></tr>
+                  <tr><th>Pressure</th><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-12 mb-4" id="forecast">
+            <h2 class="h4">Next 12 Hours</h2>
+            <div style="overflow-x:auto">
+              <table class="table table-bordered text-center">
+                <thead><tr>@for (h of hourly; track h.hour) { <th>{{ h.hour }}</th> }</tr></thead>
+                <tbody>
+                  <tr>@for (h of hourly; track h.hour) { <td>—</td> }</tr>
+                  <tr>@for (h of hourly; track h.hour) { <td>—</td> }</tr>
+                  <tr>@for (h of hourly; track h.hour) { <td>—</td> }</tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 mb-4">
+            <h2 class="h4">7-Day Forecast</h2>
+            <table class="table table-bordered">
+              <thead><tr><th>Day</th><th>Condition</th><th>High</th><th>Low</th><th>Precip.</th></tr></thead>
+              <tbody>
+                @for (f of forecast; track f.day) {
+                  <tr><td>{{ f.day }}</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="col-12 col-lg-6 mb-4">
+            <h2 class="h4">Historical Comparison</h2>
+            <table class="table table-bordered">
+              <thead><tr><th></th><th>1 Year Ago</th><th>5 Years Ago</th><th>10 Years Ago</th></tr></thead>
+              <tbody>
+                @for (row of almanacRows; track row) {
+                  <tr><th>{{ row }}</th><td>—</td><td>—</td><td>—</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <small>
+          Forecasts by <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>.
+          Alerts by <a href="https://weather.gov" target="_blank" rel="noreferrer">NWS</a>.
+        </small>
+      </div>
+
+      <div class="tab-content content3" id="water-container">
+        <h2 class="h4 mb-3">Reservoirs near {{ cityName() }}</h2>
+        <p><em>Water data coming soon.</em></p>
+        <small class="d-block mt-3">
+          Source: <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>
+        </small>
+      </div>
+
+      <div class="tab-content content4" id="transportation-container">
+        <p><em>Transportation data coming soon.</em></p>
+      </div>
+    </div>
+  </main>
+
+  <app-footer>
+    @if (city(); as c) {
+      <p class="mb-2">
+        Nearby:
+        @for (name of c.nearby ?? []; track name; let i = $index) {
+          <span>@if (i > 0) {, }<a [routerLink]="['/city', name]">{{ name }}</a></span>
+        }
+      </p>
+      <p class="mb-2">Searched {{ c.timesSearched.toLocaleString() }} times</p>
+    }
+  </app-footer>
+</div>

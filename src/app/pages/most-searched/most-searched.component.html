@@ -1,0 +1,33 @@
+<div class="container-fluid d-flex flex-column">
+  <app-nav-bar />
+
+  <main class="p-4">
+    <h1 class="mb-4">Top 100 Most Searched Cities</h1>
+
+    @if (loading()) { <p>Loading…</p> }
+    @if (error()) { <p class="text-danger">{{ error() }}</p> }
+
+    @if (!loading() && !error()) {
+      <table class="table table-bordered" id="most-searched">
+        <thead>
+          <tr>
+            <th style="cursor:pointer" (click)="handleSort('rank')">Rank{{ indicator('rank') }}</th>
+            <th style="cursor:pointer" (click)="handleSort('name')">City{{ indicator('name') }}</th>
+            <th style="cursor:pointer" (click)="handleSort('count')">Times Searched{{ indicator('count') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (city of sorted(); track city.name) {
+            <tr>
+              <td>{{ city.rank }}</td>
+              <td><a [routerLink]="['/city', city.name]">{{ city.name }}</a></td>
+              <td>{{ city.count.toLocaleString() }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </main>
+
+  <app-footer />
+</div>

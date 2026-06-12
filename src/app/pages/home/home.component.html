@@ -1,0 +1,67 @@
+<div class="container-fluid d-flex flex-column" style="min-height: 100vh">
+  <app-nav-bar variant="home" />
+
+  <main class="d-flex flex-row flex-grow-1 p-2">
+    <div class="d-flex flex-column p-4" style="max-width: 420px">
+      <h1 class="visually-hidden">Texas City Snapshot</h1>
+
+      <form class="d-flex gap-2 mb-4" (submit)="handleSearch(cityInput.value, $event)">
+        <input
+          #cityInput
+          type="text"
+          id="city-name"
+          list="city-names"
+          class="form-control"
+          placeholder="City name…"
+          autocomplete="off"
+        />
+        <datalist id="city-names">
+          @for (name of cityNames() ?? []; track name) {
+            <option [value]="name"></option>
+          }
+        </datalist>
+        <button type="submit" class="btn" id="submit-button" aria-label="Search">
+          <span class="material-symbols-outlined">search</span>
+        </button>
+        <button type="button" class="btn" id="random-button" aria-label="Random city" (click)="handleRandom()">
+          <span class="material-symbols-outlined">casino</span>
+        </button>
+      </form>
+
+      <div class="d-flex flex-row gap-4">
+        <div>
+          <h2 class="h5">Most Searched</h2>
+          <ol>
+            @if (topSearched(); as top) {
+              @for (c of top; track c.name) {
+                <li><a [routerLink]="['/city', c.name]">{{ c.name }}</a></li>
+              }
+            } @else {
+              <li><em>Loading…</em></li>
+            }
+          </ol>
+        </div>
+        <div>
+          <h2 class="h5">Recently Searched</h2>
+          <ol>
+            @if (recentSearched()?.length) {
+              @for (c of recentSearched()!; track c.name) {
+                <li><a [routerLink]="['/city', c.name]">{{ c.name }}</a></li>
+              }
+            } @else {
+              <li><em>No recent searches</em></li>
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+      <img id="texas-map" src="assets/texas.png" alt="Map of Texas" style="cursor: crosshair" />
+    </div>
+  </main>
+
+  <footer class="p-2 text-center">
+    <a routerLink="/about">About this app</a>
+  </footer>
+</div>
