@@ -1,12 +1,13 @@
 import type { RouteHandler } from '../types'
 import { getDb } from '../db'
 import { ok, notFound, badRequest } from '../response'
+import { Collections } from '../collections'
 
 /** GET /cities — full name list for autocomplete */
 export const listCities: RouteHandler = async ({ origin }) => {
   const db   = await getDb()
   const docs = await db
-    .collection('city')
+    .collection(Collections.city)
     .find({}, { projection: { 'properties.name': 1, _id: 0 } })
     .sort({ 'properties.name': 1 })
     .toArray()
@@ -16,7 +17,7 @@ export const listCities: RouteHandler = async ({ origin }) => {
 /** GET /cities/:name — full city document */
 export const getCity: RouteHandler = async ({ params, origin }) => {
   const db   = await getDb()
-  const city = await db.collection('city').findOne(
+  const city = await db.collection(Collections.city).findOne(
     { 'properties.name': params.name },
     { projection: { _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
@@ -24,7 +25,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
 
   const lat = parseFloat(city.properties.intptlat)
   const lon = parseFloat(city.properties.intptlon)
-  const nearbyDocs = await db.collection('city').aggregate([
+  const nearbyDocs = await db.collection(Collections.city).aggregate([
     {
       $geoNear: {
         near:          { type: 'Point', coordinates: [lon, lat] },
@@ -46,7 +47,7 @@ export const getTopSearched: RouteHandler = async ({ query, origin }) => {
   const limit = Math.min(Number(query.limit ?? 100), 500)
   const db    = await getDb()
   const docs  = await db
-    .collection('city')
+    .collection(Collections.city)
     .find({}, { projection: { 'properties.name': 1, timesSearched: 1, _id: 0 } })
     .sort({ timesSearched: -1 })
     .limit(limit)
@@ -59,7 +60,7 @@ export const getRecentSearched: RouteHandler = async ({ query, origin }) => {
   const limit = Math.min(Number(query.limit ?? 10), 50)
   const db    = await getDb()
   const docs  = await db
-    .collection('city')
+    .collection(Collections.city)
     .find(
       { lastSearched: { $exists: true, $ne: null } },
       { projection: { 'properties.name': 1, 'properties.intptlat': 1, 'properties.intptlon': 1, lastSearched: 1, _id: 0 } },
@@ -74,7 +75,7 @@ export const getRecentSearched: RouteHandler = async ({ query, origin }) => {
 export const recordSearch: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
   const db     = await getDb()
-  const result = await db.collection('city').findOneAndUpdate(
+  const result = await db.collection(Collections.city).findOneAndUpdate(
     { 'properties.name': params.name },
     {
       $inc: { timesSearched: 1 },

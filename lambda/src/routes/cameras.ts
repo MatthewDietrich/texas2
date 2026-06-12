@@ -2,13 +2,14 @@ import type { RouteHandler } from '../types'
 import { getDb } from '../db'
 import { ok, notFound, badRequest } from '../response'
 import { getCctvSnapshot } from '../txdot'
+import { Collections } from '../collections'
 
 const NUM_CAMERAS = 8
 
 /** GET /cameras/:id — camera metadata + live snapshot from TxDOT */
 export const getCamera: RouteHandler = async ({ params, origin }) => {
   const db     = await getDb()
-  const camera = await db.collection('camera').findOne(
+  const camera = await db.collection(Collections.camera).findOne(
     { icdId: params.id },
     { projection: { _id: 0 } },
   )
@@ -29,7 +30,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
 
   const db   = await getDb()
-  const city = await db.collection('city').findOne(
+  const city = await db.collection(Collections.city).findOne(
     { 'properties.name': params.name },
     {
       projection: { 'properties.intptlat': 1, 'properties.intptlon': 1, _id: 0 },
@@ -41,7 +42,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat)
   const lon = parseFloat(city.properties.intptlon)
 
-  const cameras = await db.collection('camera').aggregate([
+  const cameras = await db.collection(Collections.camera).aggregate([
     {
       $geoNear: {
         near:          { type: 'Point', coordinates: [lon, lat] },
@@ -62,7 +63,7 @@ export const recordView: RouteHandler = async ({ params, origin }) => {
   if (!params.id) return badRequest('Camera id is required', origin)
 
   const db     = await getDb()
-  const result = await db.collection('camera').findOneAndUpdate(
+  const result = await db.collection(Collections.camera).findOneAndUpdate(
     { icdId: params.id },
     {
       $inc: { timesViewed: 1 },
