@@ -34,7 +34,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
 
   const cameras = await db.collection('cameras').find(
-    { location: { $geoNear: { $geometry: city.geometry } } },
+    { location: { $geoWithin: { $geometry: city.geometry } } },
     { projection: { _id: 0 } },
   )
     .limit(NUM_CAMERAS)
