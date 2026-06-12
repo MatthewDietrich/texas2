@@ -22,23 +22,37 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
   return ok({ ...camera, snapshot }, origin)
 }
 
-/** GET /cities/:name/cameras — cameras near a city using a $geoNear query */
+const FIVE_MILES_METRES = 8047
+
+/** GET /cities/:name/cameras — cameras within 5 miles of the city's internal point */
 export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest('City name is required', origin)
 
   const db   = await getDb()
   const city = await db.collection('city').findOne(
     { 'properties.name': params.name },
-    { projection: { geometry: 1, _id: 0 }, collation: { locale: 'en', strength: 2 } },
+    {
+      projection: { 'properties.intptlat': 1, 'properties.intptlon': 1, _id: 0 },
+      collation:  { locale: 'en', strength: 2 },
+    },
   )
   if (!city) return notFound(`No city found with name "${params.name}"`, origin)
 
-  const cameras = await db.collection('cameras').find(
-    { location: { $geoWithin: { $geometry: city.geometry } } },
-    { projection: { _id: 0 } },
-  )
-    .limit(NUM_CAMERAS)
-    .toArray()
+  const lat = parseFloat(city.properties.intptlat)
+  const lon = parseFloat(city.properties.intptlon)
+
+  const cameras = await db.collection('cameras').aggregate([
+    {
+      $geoNear: {
+        near:          { type: 'Point', coordinates: [lon, lat] },
+        distanceField: 'dist',
+        maxDistance:   FIVE_MILES_METRES,
+        spherical:     true,
+      },
+    },
+    { $limit: NUM_CAMERAS },
+    { $project: { _id: 0, dist: 0 } },
+  ]).toArray()
 
   return ok(cameras, origin)
 }
