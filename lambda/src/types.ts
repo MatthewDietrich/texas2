@@ -57,3 +57,13 @@ export interface AirportDoc {
     AIRPRT_NM: string
   }
 }
+
+export interface HighwayDoc {
+  type: 'Feature'
+  id: number
+  geometry: {
+    type: 'LineString'
+    coordinates: [number, number][]
+  }
+  name: string
+}

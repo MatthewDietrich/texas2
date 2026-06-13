@@ -58,7 +58,7 @@ export class CityComponent {
       this.loadCameras(name)
       console.log('[recordSearch] calling', name)
       recordSearch(name)
-        .then(() => console.log('[recordSearch] ok'))
+        .then(r => console.log('[recordSearch] ok', r))
         .catch(err => console.error('[recordSearch] error', err))
     })
   }

@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   recentSearched = signal<RecentCity[] | null>(null)
 
   ngOnInit(): void {
+    console.log('[home] ngOnInit')
     getCityNames().then(n => this.cityNames.set(n)).catch(() => {})
     getTopSearched(5).then(t => this.topSearched.set(t)).catch(() => {})
     getRecentSearched(10)
