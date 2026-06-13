@@ -56,7 +56,7 @@ export class CityComponent {
       const name = this.cityName()
       this.loadCity(name)
       this.loadCameras(name)
-      recordSearch(name).catch(() => {})
+      recordSearch(name).catch(err => console.error('[recordSearch]', err))
     })
   }
 

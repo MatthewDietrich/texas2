@@ -27,7 +27,7 @@ class TexasCityApiStack extends Stack {
     // Set AMPLIFY_APP_URL in the Amplify Console environment variables.
     const allowedOrigins = [
       process.env.AMPLIFY_APP_URL ?? '',
-      'http://localhost:5173',
+      'http://localhost:4200',
     ].filter(Boolean)
 
     // CORS is owned entirely here — the Lambda itself sets no Access-Control-* headers.
