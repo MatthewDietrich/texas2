@@ -27,25 +27,37 @@
       </div>
 
       <div class="tab-content content1" id="snapshots-container">
-        @if (camsLoading()) { <p>Loading cameras…</p> }
         @if (camsError()) { <p class="text-danger">{{ camsError() }}</p> }
         @if (!camsLoading() && !camsError() && cameras()?.length === 0) {
           <p>No cameras found near this city.</p>
         }
         <div class="row" id="snapshots">
-          @for (cam of cameras() ?? []; track cam.icdId; let i = $index) {
-            <div class="col-sm-6 mb-3">
-              <div class="img-container">
-                @if (cam.snapshot) {
-                  <img [src]="'data:image/jpeg;base64,' + cam.snapshot" [alt]="cam.icdId" style="width:100%" />
-                } @else {
-                  <img src="/unavailable.png" alt="Snapshot unavailable" style="width:100%" />
-                }
-                <div class="img-caption">
-                  <a [routerLink]="['/camera', cam.icdId]" class="icdId">{{ cam.icdId }}</a>
+          @if (camsLoading()) {
+            @for (i of cameraPlaceholders; track i) {
+              <div class="col-sm-6 mb-3">
+                <div class="img-container">
+                  <div style="width:100%;height:150px;background:var(--secondary-bg);display:flex;align-items:center;justify-content:center">
+                    <span>Loading…</span>
+                  </div>
+                  <div class="img-caption">&nbsp;</div>
                 </div>
               </div>
-            </div>
+            }
+          } @else {
+            @for (cam of cameras() ?? []; track cam.icdId) {
+              <div class="col-sm-6 mb-3">
+                <div class="img-container">
+                  @if (cam.snapshot) {
+                    <img [src]="'data:image/jpeg;base64,' + cam.snapshot" [alt]="cam.icdId" style="width:100%" />
+                  } @else {
+                    <img src="/unavailable.png" alt="Snapshot unavailable" style="width:100%" />
+                  }
+                  <div class="img-caption">
+                    <a [routerLink]="['/camera', cam.icdId]" class="icdId">{{ cam.icdId }}</a>
+                  </div>
+                </div>
+              </div>
+            }
           }
         </div>
         <small>

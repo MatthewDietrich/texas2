@@ -7,6 +7,8 @@ import { getCamerasForCity } from '../../../api/cameras'
 import type { City } from '../../../api/cities'
 import type { Camera } from '../../../api/cameras'
 
+const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i)
+
 const HOURLY = Array.from({ length: 12 }, (_, i) => ({ hour: `${(8 + i) % 24}:00` }))
 
 const FORECAST = [
@@ -35,7 +37,8 @@ export class CityComponent {
   camsLoading = signal(true)
   camsError   = signal<string | null>(null)
 
-  readonly hourly      = HOURLY
+  readonly cameraPlaceholders = CAMERA_PLACEHOLDERS
+  readonly hourly             = HOURLY
   readonly forecast    = FORECAST
   readonly almanacRows = ALMANAC_ROWS
 
