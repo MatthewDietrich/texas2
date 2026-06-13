@@ -6,6 +6,7 @@ import { resetClient } from './db'
 import { listCities, getCity, getTopSearched, getRecentSearched, recordSearch } from './routes/cities'
 import { getCamera, getCamerasForCity, recordView } from './routes/cameras'
 import { refreshDistrict } from './routes/districts'
+import { refreshReservoirs } from './routes/reservoirs'
 
 // ── Route table ──────────────────────────────────────────────────────────────
 // Pattern groups become named params (keys array must match group order).
@@ -25,6 +26,8 @@ const ROUTES: Route[] = [
   { method: 'POST', pattern: /^\/cameras\/([^/]+)\/view$/,     keys: ['id'],   handler: recordView },
   // Districts — writes
   { method: 'POST', pattern: /^\/districts\/([^/]+)\/refresh$/, keys: ['code'], handler: refreshDistrict },
+  // Reservoirs — writes
+  { method: 'POST', pattern: /^\/reservoirs\/refresh$/,          keys: [],       handler: refreshReservoirs },
 ]
 
 // ── Handler ──────────────────────────────────────────────────────────────────

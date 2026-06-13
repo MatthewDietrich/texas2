@@ -7,7 +7,7 @@
       @if (cityLoading()) { <p>Loading…</p> }
       @if (cityError()) { <p class="text-danger">{{ cityError() }}</p> }
       @if (city(); as c) {
-        <p>{{ c.county }}, {{ c.state }}</p>
+        <p>{{ c.county }} County, Texas</p>
         <p>{{ lat() }}° N, {{ lon() }}° W</p>
         <p>Population: {{ c.population.toLocaleString() }}</p>
       }
