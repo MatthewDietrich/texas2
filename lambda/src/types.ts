@@ -44,3 +44,16 @@ export interface CameraDoc {
   timesViewed:          number
   lastViewed:           string | null
 }
+
+export interface AirportDoc {
+  type: 'Feature'
+  id: number
+  geometry: {
+    type: 'Point'
+    coordinates: [number, number]
+  }
+  properties: {
+    GID: number
+    AIRPRT_NM: string
+  }
+}

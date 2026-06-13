@@ -20,7 +20,9 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     getCityNames().then(n => this.cityNames.set(n)).catch(() => {})
     getTopSearched(5).then(t => this.topSearched.set(t)).catch(() => {})
-    getRecentSearched(10).then(r => this.recentSearched.set(r)).catch(() => {})
+    getRecentSearched(10)
+      .then(r => { console.log('[recent] fetched', r); this.recentSearched.set(r) })
+      .catch(err => console.error('[recent] error', err))
   }
 
   handleSearch(value: string, event: Event): void {
