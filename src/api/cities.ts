@@ -14,6 +14,7 @@ export interface City {
   timesSearched: number
   lastSearched:  string | null
   nearby?:       string[]
+  reservoirs?:   { name: string; percentFull: number | null }[]
 }
 
 export interface SearchedCity {

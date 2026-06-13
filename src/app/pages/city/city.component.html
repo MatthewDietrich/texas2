@@ -132,7 +132,22 @@
 
       <div class="tab-content content3" id="water-container">
         <h2 class="h4 mb-3">Reservoirs near {{ cityName() }}</h2>
-        <p><em>Water data coming soon.</em></p>
+        @if (city()?.reservoirs?.length) {
+          <ul>
+            @for (r of city()!.reservoirs!; track r.name) {
+              <li>
+                {{ r.name }} —
+                @if (r.percentFull != null) {
+                  {{ r.percentFull }}% full
+                } @else {
+                  no data
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p><em>No reservoir data available.</em></p>
+        }
         <small class="d-block mt-3">
           Source: <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>
         </small>

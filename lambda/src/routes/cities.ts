@@ -26,7 +26,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat)
   const lon = parseFloat(city.properties.intptlon)
 
-  const [nearbyDocs, countyDocs] = await Promise.all([
+  const [nearbyDocs, countyDocs, reservoirDocs] = await Promise.all([
     db.collection(Collections.city).aggregate([
       {
         $geoNear: {
@@ -52,12 +52,27 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
       { $limit: 1 },
       { $project: { 'properties.name': 1, _id: 0 } },
     ]).toArray(),
+    db.collection(Collections.reservoir).aggregate([
+      {
+        $geoNear: {
+          near:          { type: 'Point', coordinates: [lon, lat] },
+          distanceField: 'dist',
+          spherical:     true,
+        },
+      },
+      { $limit: 5 },
+      { $project: { 'properties.name': 1, percentFull: 1, _id: 0 } },
+    ]).toArray(),
   ])
 
   return ok({
     ...city,
-    county: countyDocs[0]?.properties?.name ?? null,
-    nearby: nearbyDocs.map((d: any) => d.properties.name),
+    county:     countyDocs[0]?.properties?.name ?? null,
+    nearby:     nearbyDocs.map((d: any) => d.properties.name),
+    reservoirs: reservoirDocs.map((d: any) => ({
+      name:        d.properties.name,
+      percentFull: d.percentFull ?? null,
+    })),
   }, origin)
 }
 
