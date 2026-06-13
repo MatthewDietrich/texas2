@@ -136,7 +136,7 @@
           <ul>
             @for (r of city()!.reservoirs!; track r.name) {
               <li>
-                {{ r.name }} —
+                {{ r.name }}@if (r.nearestCity) { (near {{ r.nearestCity }})} —
                 @if (r.percentFull != null) {
                   {{ r.percentFull }}% full
                 } @else {
