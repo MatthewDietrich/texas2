@@ -131,7 +131,7 @@ export const recordSearch: RouteHandler = async ({ params, origin }) => {
     { 'properties.name': params.name },
     {
       $inc: { timesSearched: 1 },
-      $set: { lastSearched: new Date().toISOString() },
+      $set: { lastSearched: new Date() },
     },
     { returnDocument: 'after', projection: { 'properties.name': 1, timesSearched: 1, _id: 0 }, collation: { locale: 'en', strength: 2 } },
   )
