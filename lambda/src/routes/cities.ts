@@ -25,21 +25,40 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
 
   const lat = parseFloat(city.properties.intptlat)
   const lon = parseFloat(city.properties.intptlon)
-  const nearbyDocs = await db.collection(Collections.city).aggregate([
-    {
-      $geoNear: {
-        near:          { type: 'Point', coordinates: [lon, lat] },
-        distanceField: 'dist',
-        spherical:     true,
-        key:           'geometry',
-        query:         { 'properties.name': { $ne: city.properties.name } },
-      },
-    },
-    { $limit: 3 },
-    { $project: { 'properties.name': 1, _id: 0 } },
-  ]).toArray()
 
-  return ok({ ...city, nearby: nearbyDocs.map((d: any) => d.properties.name) }, origin)
+  const [nearbyDocs, countyDocs] = await Promise.all([
+    db.collection(Collections.city).aggregate([
+      {
+        $geoNear: {
+          near:          { type: 'Point', coordinates: [lon, lat] },
+          distanceField: 'dist',
+          spherical:     true,
+          key:           'geometry',
+          query:         { 'properties.name': { $ne: city.properties.name } },
+        },
+      },
+      { $limit: 3 },
+      { $project: { 'properties.name': 1, _id: 0 } },
+    ]).toArray(),
+    db.collection(Collections.county).aggregate([
+      {
+        $geoNear: {
+          near:          { type: 'Point', coordinates: [lon, lat] },
+          distanceField: 'dist',
+          spherical:     true,
+          key:           'geometry',
+        },
+      },
+      { $limit: 1 },
+      { $project: { 'properties.name': 1, _id: 0 } },
+    ]).toArray(),
+  ])
+
+  return ok({
+    ...city,
+    county: countyDocs[0]?.properties?.name ?? null,
+    nearby: nearbyDocs.map((d: any) => d.properties.name),
+  }, origin)
 }
 
 /** GET /searches/top?limit=100 — most-searched cities, sorted by timesSearched desc */
