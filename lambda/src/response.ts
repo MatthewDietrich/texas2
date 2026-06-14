@@ -1,22 +1,43 @@
-import type { APIGatewayProxyResultV2 } from 'aws-lambda'
+import type { APIGatewayProxyResultV2 } from "aws-lambda";
 
 // CORS headers are handled entirely by the Lambda Function URL's CORS configuration.
 // Setting them here too causes duplicate Access-Control-Allow-Origin headers, which
 // browsers reject. Only Content-Type belongs in the Lambda response.
-const HEADERS = { 'Content-Type': 'application/json' }
+const HEADERS = { "Content-Type": "application/json" };
 
 export function ok(body: unknown, _origin?: string): APIGatewayProxyResultV2 {
-  return { statusCode: 200, headers: HEADERS, body: JSON.stringify(body) }
+  return { statusCode: 200, headers: HEADERS, body: JSON.stringify(body) };
 }
 
-export function notFound(message: string, _origin?: string): APIGatewayProxyResultV2 {
-  return { statusCode: 404, headers: HEADERS, body: JSON.stringify({ error: message }) }
+export function notFound(
+  message: string,
+  _origin?: string,
+): APIGatewayProxyResultV2 {
+  return {
+    statusCode: 404,
+    headers: HEADERS,
+    body: JSON.stringify({ error: message }),
+  };
 }
 
-export function badRequest(message: string, _origin?: string): APIGatewayProxyResultV2 {
-  return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: message }) }
+export function badRequest(
+  message: string,
+  _origin?: string,
+): APIGatewayProxyResultV2 {
+  return {
+    statusCode: 400,
+    headers: HEADERS,
+    body: JSON.stringify({ error: message }),
+  };
 }
 
-export function serverError(message: string, _origin?: string): APIGatewayProxyResultV2 {
-  return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: message }) }
+export function serverError(
+  message: string,
+  _origin?: string,
+): APIGatewayProxyResultV2 {
+  return {
+    statusCode: 500,
+    headers: HEADERS,
+    body: JSON.stringify({ error: message }),
+  };
 }

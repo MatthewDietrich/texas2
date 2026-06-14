@@ -6,38 +6,70 @@
       <div class="lb-head">
         <div>
           <div class="eyebrow mb2">
-            <svg class="ic" style="width:13px;height:13px;display:inline"><use href="#i-trophy"></use></svg>
+            <svg class="ic" style="width: 13px; height: 13px; display: inline">
+              <use href="#i-trophy"></use>
+            </svg>
             Leaderboard
           </div>
-          <h1 class="h-display" style="font-size:clamp(34px,5vw,52px)">Most searched cities</h1>
-          <p class="muted mt3">The 100 towns Texans look up the most. Updated continuously.</p>
+          <h1 class="h-display" style="font-size: clamp(34px, 5vw, 52px)">
+            Most searched cities
+          </h1>
+          <p class="muted mt3">
+            The 100 towns Texans look up the most. Updated continuously.
+          </p>
         </div>
       </div>
 
-      @if (loading()) { <p class="muted">Loading…</p> }
-      @if (error())   { <p style="color:var(--accent)">{{ error() }}</p> }
+      @if (loading()) {
+        <p class="muted">Loading…</p>
+      }
+      @if (error()) {
+        <p style="color: var(--accent)">{{ error() }}</p>
+      }
 
       @if (!loading() && !error()) {
         <div class="card lb-table-card">
           <table class="dtable">
             <thead>
               <tr>
-                <th class="rk" style="cursor:pointer" (click)="handleSort('rank')">Rank{{ indicator('rank') }}</th>
-                <th style="cursor:pointer" (click)="handleSort('name')">City{{ indicator('name') }}</th>
-                <th class="lb-hide num" style="cursor:pointer" (click)="handleSort('count')">Searches{{ indicator('count') }}</th>
+                <th
+                  class="rk"
+                  style="cursor: pointer"
+                  (click)="handleSort('rank')"
+                >
+                  Rank{{ indicator("rank") }}
+                </th>
+                <th style="cursor: pointer" (click)="handleSort('name')">
+                  City{{ indicator("name") }}
+                </th>
+                <th
+                  class="lb-hide num"
+                  style="cursor: pointer"
+                  (click)="handleSort('count')"
+                >
+                  Searches{{ indicator("count") }}
+                </th>
               </tr>
             </thead>
             <tbody>
               @for (city of sorted(); track city.name) {
                 <tr>
-                  <td class="rk" [class.medal]="isMedal(city.rank)">{{ rankLabel(city.rank) }}</td>
+                  <td class="rk" [class.medal]="isMedal(city.rank)">
+                    {{ rankLabel(city.rank) }}
+                  </td>
                   <td>
-                    <a class="cname" [routerLink]="['/city', city.name]">{{ city.name }}</a>
+                    <a class="cname" [routerLink]="['/city', city.name]">{{
+                      city.name
+                    }}</a>
                   </td>
                   <td class="lb-hide">
                     <div class="bar-cell">
-                      <span class="mono" style="font-size:14px">{{ city.count.toLocaleString() }}</span>
-                      <div class="mini"><span [style.width.%]="barWidth(city.count)"></span></div>
+                      <span class="mono" style="font-size: 14px">{{
+                        city.count.toLocaleString()
+                      }}</span>
+                      <div class="mini">
+                        <span [style.width.%]="barWidth(city.count)"></span>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -45,7 +77,9 @@
             </tbody>
           </table>
         </div>
-        <p class="subtle mt5" style="text-align:center;font-size:13px">Showing 1–{{ sorted().length }} of 100</p>
+        <p class="subtle mt5" style="text-align: center; font-size: 13px">
+          Showing 1–{{ sorted().length }} of 100
+        </p>
       }
     </div>
   </main>

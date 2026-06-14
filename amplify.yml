@@ -20,7 +20,7 @@ frontend:
   artifacts:
     baseDirectory: dist/texas2/browser
     files:
-      - '**/*'
+      - "**/*"
   cache:
     paths:
       - .npm/**/*

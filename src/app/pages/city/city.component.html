@@ -8,8 +8,14 @@
           <div class="eyebrow mb2">{{ c.county }} County, Texas</div>
         }
         <h1 class="h-display">{{ cityName() }}</h1>
-        @if (cityLoading()) { <p class="muted mt4">Loading…</p> }
-        @if (cityError())   { <p class="muted mt4" style="color:var(--accent)">{{ cityError() }}</p> }
+        @if (cityLoading()) {
+          <p class="muted mt4">Loading…</p>
+        }
+        @if (cityError()) {
+          <p class="muted mt4" style="color: var(--accent)">
+            {{ cityError() }}
+          </p>
+        }
         @if (city(); as c) {
           <div class="statrow mt5">
             <div class="stat">
@@ -31,31 +37,49 @@
 
     <div class="tabbar">
       <div class="segtabs" role="tablist">
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'snap'"    (click)="activeTab.set('snap')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'snap'"
+          (click)="activeTab.set('snap')"
+        >
           <svg class="ic"><use href="#i-camera"></use></svg> Snapshots
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'weather'" (click)="activeTab.set('weather')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'weather'"
+          (click)="activeTab.set('weather')"
+        >
           <svg class="ic"><use href="#i-cloud"></use></svg> Weather
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'water'"   (click)="activeTab.set('water')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'water'"
+          (click)="activeTab.set('water')"
+        >
           <svg class="ic"><use href="#i-droplet"></use></svg> Water
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'trans'"   (click)="activeTab.set('trans')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'trans'"
+          (click)="activeTab.set('trans')"
+        >
           <svg class="ic"><use href="#i-car"></use></svg> Transportation
         </button>
       </div>
-      <span class="alert calm"><svg class="ic"><use href="#i-check"></use></svg> No active weather alerts</span>
+      <span class="alert calm"
+        ><svg class="ic"><use href="#i-check"></use></svg> No active weather
+        alerts</span
+      >
     </div>
 
     <div class="panels">
-
       <!-- SNAPSHOTS -->
       <section class="tabpanel" [class.active]="activeTab() === 'snap'">
         <div class="flex between center mb4">
           <h2 class="h-section">Live road cameras</h2>
         </div>
         @if (camsError()) {
-          <p style="color:var(--accent)">{{ camsError() }}</p>
+          <p style="color: var(--accent)">{{ camsError() }}</p>
         }
         @if (!camsLoading() && !camsError() && cameras()?.length === 0) {
           <p class="muted">No cameras found near this city.</p>
@@ -73,20 +97,30 @@
               <article class="cam">
                 <div class="cam-thumb">
                   @if (cam.snapshot) {
-                    <img [src]="'data:image/jpeg;base64,' + cam.snapshot" [alt]="cam.icdId">
+                    <img
+                      [src]="'data:image/jpeg;base64,' + cam.snapshot"
+                      [alt]="cam.icdId"
+                    />
                   } @else {
-                    <img src="/unavailable.png" alt="Snapshot unavailable">
+                    <img src="/unavailable.png" alt="Snapshot unavailable" />
                   }
                 </div>
                 <div class="cam-meta">
-                  <a [routerLink]="['/camera', cam.icdId]" class="cam-id">{{ cam.icdId }}</a>
+                  <a [routerLink]="['/camera', cam.icdId]" class="cam-id">{{
+                    cam.icdId
+                  }}</a>
                   <span class="cam-dir">{{ cam.direction }}bound</span>
                 </div>
               </article>
             }
           }
         </div>
-        <p class="src-line mt5">Camera snapshots from the <a href="https://txdot.gov" target="_blank" rel="noreferrer">Texas Department of Transportation</a>.</p>
+        <p class="src-line mt5">
+          Camera snapshots from the
+          <a href="https://txdot.gov" target="_blank" rel="noreferrer"
+            >Texas Department of Transportation</a
+          >.
+        </p>
       </section>
 
       <!-- WEATHER -->
@@ -97,16 +131,38 @@
               <span class="wi">&#xf00d;</span>
               <div>
                 <div class="deg">—°</div>
-                <div class="cond"><div class="c">—</div><div class="f">Feels like —</div></div>
+                <div class="cond">
+                  <div class="c">—</div>
+                  <div class="f">Feels like —</div>
+                </div>
               </div>
             </div>
             <div class="now-grid">
-              <div class="metric"><span class="k"><span class="wi">&#xf07a;</span> Humidity</span><span class="v">—</span></div>
-              <div class="metric"><span class="k"><span class="wi">&#xf04e;</span> Precip.</span><span class="v">—</span></div>
-              <div class="metric"><span class="k"><span class="wi">&#xf041;</span> Cloud cover</span><span class="v">—</span></div>
-              <div class="metric"><span class="k"><span class="wi">&#xf050;</span> Wind</span><span class="v">—</span></div>
-              <div class="metric"><span class="k"><span class="wi">&#xf079;</span> Pressure</span><span class="v">—</span></div>
-              <div class="metric"><span class="k"><span class="wi">&#xf055;</span> Dew point</span><span class="v">—</span></div>
+              <div class="metric">
+                <span class="k"><span class="wi">&#xf07a;</span> Humidity</span
+                ><span class="v">—</span>
+              </div>
+              <div class="metric">
+                <span class="k"><span class="wi">&#xf04e;</span> Precip.</span
+                ><span class="v">—</span>
+              </div>
+              <div class="metric">
+                <span class="k"
+                  ><span class="wi">&#xf041;</span> Cloud cover</span
+                ><span class="v">—</span>
+              </div>
+              <div class="metric">
+                <span class="k"><span class="wi">&#xf050;</span> Wind</span
+                ><span class="v">—</span>
+              </div>
+              <div class="metric">
+                <span class="k"><span class="wi">&#xf079;</span> Pressure</span
+                ><span class="v">—</span>
+              </div>
+              <div class="metric">
+                <span class="k"><span class="wi">&#xf055;</span> Dew point</span
+                ><span class="v">—</span>
+              </div>
             </div>
           </div>
         </div>
@@ -123,7 +179,9 @@
           }
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)">
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5)"
+        >
           <div>
             <h3 class="card-title mb4">7-day forecast</h3>
             <div class="card card-pad">
@@ -133,7 +191,9 @@
                     <span class="fc-day">{{ f.day }}</span>
                     <span class="wi">&#xf00d;</span>
                     <span class="fc-bar"></span>
-                    <span class="fc-temps"><span>—</span><span class="lo">—</span></span>
+                    <span class="fc-temps"
+                      ><span>—</span><span class="lo">—</span></span
+                    >
                   </div>
                 }
               </div>
@@ -142,25 +202,48 @@
           <div>
             <h3 class="card-title mb4">On this day — historical</h3>
             <div class="card card-pad">
-              <table class="dtable" style="font-size:14px">
-                <thead><tr><th></th><th class="num">1 yr</th><th class="num">5 yr</th><th class="num">10 yr</th></tr></thead>
+              <table class="dtable" style="font-size: 14px">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="num">1 yr</th>
+                    <th class="num">5 yr</th>
+                    <th class="num">10 yr</th>
+                  </tr>
+                </thead>
                 <tbody>
                   @for (row of almanacRows; track row) {
-                    <tr><td>{{ row }}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+                    <tr>
+                      <td>{{ row }}</td>
+                      <td class="num">—</td>
+                      <td class="num">—</td>
+                      <td class="num">—</td>
+                    </tr>
                   }
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        <p class="src-line mt5">Forecasts by <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a> · Alerts by the <a href="https://weather.gov" target="_blank" rel="noreferrer">National Weather Service</a>.</p>
+        <p class="src-line mt5">
+          Forecasts by
+          <a href="https://open-meteo.com" target="_blank" rel="noreferrer"
+            >Open-Meteo</a
+          >
+          · Alerts by the
+          <a href="https://weather.gov" target="_blank" rel="noreferrer"
+            >National Weather Service</a
+          >.
+        </p>
       </section>
 
       <!-- WATER -->
       <section class="tabpanel" [class.active]="activeTab() === 'water'">
         <div class="flex between center mb5">
           <h2 class="h-section">Reservoirs near {{ cityName() }}</h2>
-          <span class="subtle mono" style="font-size:13px">updated 24h ago</span>
+          <span class="subtle mono" style="font-size: 13px"
+            >updated 24h ago</span
+          >
         </div>
         @if (city()?.reservoirs?.length) {
           <div class="card card-pad">
@@ -170,14 +253,23 @@
                   <div class="res-head">
                     <div>
                       <span class="res-name">{{ r.name }}</span>
-                      @if (r.nearestCity) { <span class="res-near">near {{ r.nearestCity }}</span> }
+                      @if (r.nearestCity) {
+                        <span class="res-near">near {{ r.nearestCity }}</span>
+                      }
                     </div>
                     <span class="res-pct">
-                      @if (r.percentFull != null) { {{ r.percentFull }}% } @else { — }
+                      @if (r.percentFull != null) {
+                        {{ r.percentFull }}%
+                      } @else {
+                        —
+                      }
                     </span>
                   </div>
                   <div class="res-track">
-                    <div class="res-fill" [style.width.%]="r.percentFull ?? 0"></div>
+                    <div
+                      class="res-fill"
+                      [style.width.%]="r.percentFull ?? 0"
+                    ></div>
                   </div>
                 </div>
               }
@@ -186,14 +278,21 @@
         } @else {
           <p class="muted"><em>No reservoir data available.</em></p>
         }
-        <p class="src-line mt5">Source: <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>.</p>
+        <p class="src-line mt5">
+          Source:
+          <a
+            href="https://waterdatafortexas.org"
+            target="_blank"
+            rel="noreferrer"
+            >Water Data for Texas</a
+          >.
+        </p>
       </section>
 
       <!-- TRANSPORTATION -->
       <section class="tabpanel" [class.active]="activeTab() === 'trans'">
         <p class="muted"><em>Transportation data coming soon.</em></p>
       </section>
-
     </div>
   </main>
 
@@ -209,7 +308,10 @@
     <div class="foot-src">
       <a routerLink="/">← Back to search</a>
       @if (city(); as c) {
-        <span class="subtle">Searched {{ c.timesSearched.toLocaleString() }} times · © Texas City Snapshot</span>
+        <span class="subtle"
+          >Searched {{ c.timesSearched.toLocaleString() }} times · © Texas City
+          Snapshot</span
+        >
       }
     </div>
   </app-footer>

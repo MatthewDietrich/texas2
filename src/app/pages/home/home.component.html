@@ -5,11 +5,15 @@
     <section class="hero">
       <div class="hero-copy">
         <h1 class="h-display">Enter the name of a city or town in Texas</h1>
-        <p class="muted mt4" style="font-size:18px;max-width:440px">
-          Current weather, road camera snapshots, and reservoir levels for any city or town in Texas.
+        <p class="muted mt4" style="font-size: 18px; max-width: 440px">
+          Current weather, road camera snapshots, and reservoir levels for any
+          city or town in Texas.
         </p>
 
-        <form class="searchbar mt6" (submit)="handleSearch(cityInput.value, $event)">
+        <form
+          class="searchbar mt6"
+          (submit)="handleSearch(cityInput.value, $event)"
+        >
           <svg class="ic lead"><use href="#i-search"></use></svg>
           <input
             #cityInput
@@ -24,7 +28,13 @@
               <option [value]="name"></option>
             }
           </datalist>
-          <button class="search-icon-btn" type="button" aria-label="Random city" title="Surprise me" (click)="handleRandom()">
+          <button
+            class="search-icon-btn"
+            type="button"
+            aria-label="Random city"
+            title="Surprise me"
+            (click)="handleRandom()"
+          >
             <svg class="ic"><use href="#i-dice"></use></svg>
           </button>
           <button class="search-icon-btn go" type="submit" aria-label="Search">
@@ -36,13 +46,15 @@
       <div class="map-stage">
         <div class="map-blob"></div>
         <div class="map-wrap">
-          <img [src]="themeService.mapSrc()" alt="Map of Texas">
+          <img [src]="themeService.mapSrc()" alt="Map of Texas" />
           <div class="map-tags">
             @for (city of sampleCities(); track city.properties.name) {
-              <a class="tag"
-                 [routerLink]="['/city', city.properties.name]"
-                 [style.left.%]="mapPos(city).left"
-                 [style.top.%]="mapPos(city).top">
+              <a
+                class="tag"
+                [routerLink]="['/city', city.properties.name]"
+                [style.left.%]="mapPos(city).left"
+                [style.top.%]="mapPos(city).top"
+              >
                 <span class="pindot"></span>
                 {{ city.properties.name }}
               </a>
@@ -56,10 +68,17 @@
       <div>
         <div class="flex between center mb4">
           <h2 class="card-title">
-            <svg class="ic" style="width:14px;height:14px;color:var(--accent)"><use href="#i-trophy"></use></svg>
+            <svg
+              class="ic"
+              style="width: 14px; height: 14px; color: var(--accent)"
+            >
+              <use href="#i-trophy"></use>
+            </svg>
             Most searched
           </h2>
-          <a class="subtle" routerLink="/mostsearched" style="font-size:13px">View all →</a>
+          <a class="subtle" routerLink="/mostsearched" style="font-size: 13px"
+            >View all →</a
+          >
         </div>
         <div class="rank-list">
           @if (topSearched(); as top) {
@@ -71,7 +90,7 @@
               </a>
             }
           } @else {
-            <p class="muted" style="padding:var(--s3) var(--s2)">Loading…</p>
+            <p class="muted" style="padding: var(--s3) var(--s2)">Loading…</p>
           }
         </div>
       </div>
@@ -79,7 +98,12 @@
       <div>
         <div class="flex between center mb4">
           <h2 class="card-title">
-            <svg class="ic" style="width:14px;height:14px;color:var(--accent)"><use href="#i-clock"></use></svg>
+            <svg
+              class="ic"
+              style="width: 14px; height: 14px; color: var(--accent)"
+            >
+              <use href="#i-clock"></use>
+            </svg>
             Recently searched
           </h2>
         </div>
@@ -93,7 +117,9 @@
               </a>
             }
           } @else {
-            <p class="subtle" style="padding:var(--s3) var(--s2)">No recent searches</p>
+            <p class="subtle" style="padding: var(--s3) var(--s2)">
+              No recent searches
+            </p>
           }
         </div>
       </div>
@@ -103,7 +129,7 @@
   <footer class="foot">
     <div class="wrap foot-src">
       <span>Texas City Snapshot</span>
-      <a routerLink="/about" style="margin-left:auto">About this app</a>
+      <a routerLink="/about" style="margin-left: auto">About this app</a>
     </div>
   </footer>
 </div>
