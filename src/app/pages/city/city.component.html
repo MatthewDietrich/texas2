@@ -131,7 +131,8 @@
           <p class="muted mt4">Loading weather…</p>
         } @else if (weatherError()) {
           <p style="color: var(--accent)">{{ weatherError() }}</p>
-        } @else if (weather(); as w) {
+        } @else {
+          @if (weather(); as w) {
           <div class="card card-pad mb5">
             <div class="now-card">
               <div class="now-temp">
@@ -285,6 +286,7 @@
               </div>
             </div>
           </div>
+          }
         }
         <p class="src-line mt5">
           Forecasts by
