@@ -6,6 +6,7 @@ import {
   getForecastByCoordinates,
   getHistoryByCoordinates,
 } from "../openmeteo";
+import { getActiveAlerts } from "../nws";
 
 function chicagoParts(date: Date): Record<string, string> {
   const p: Record<string, string> = {};
@@ -64,7 +65,7 @@ export const getWeather: RouteHandler = async ({ params, origin }) => {
   const lon = parseFloat(city.properties.intptlon);
   const now = new Date();
 
-  const [forecast, hist1, hist5, hist10] = await Promise.all([
+  const [forecast, hist1, hist5, hist10, alertsResult] = await Promise.all([
     getForecastByCoordinates(lat, lon),
     getHistoryByCoordinates(
       lat,
@@ -84,7 +85,15 @@ export const getWeather: RouteHandler = async ({ params, origin }) => {
       chicagoDateStr(shiftYears(now, 10)),
       chicagoDateStr(shiftYears(now, 10)),
     ),
+    getActiveAlerts(lat, lon).catch(() => null),
   ]);
+
+  const alerts = (alertsResult?.features ?? []).map((f) => ({
+    id: f.properties.id,
+    event: f.properties.event,
+    severity: f.properties.severity,
+    expires: f.properties.ends ?? f.properties.expires,
+  }));
 
   // Next 12 hours starting from the current hour
   const hourKey = chicagoHourKey(now);
@@ -152,6 +161,7 @@ export const getWeather: RouteHandler = async ({ params, origin }) => {
         yr5: almanacEntry(hist5),
         yr10: almanacEntry(hist10),
       },
+      alerts,
     },
     origin,
   );

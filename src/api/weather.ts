@@ -36,6 +36,13 @@ export interface AlmanacEntry {
   precipIn: number;
 }
 
+export interface WeatherAlert {
+  id: string;
+  event: string;
+  severity: string;
+  expires: string;
+}
+
 export interface Weather {
   current: WeatherCurrent;
   hourly: WeatherHour[];
@@ -45,6 +52,7 @@ export interface Weather {
     yr5: AlmanacEntry | null;
     yr10: AlmanacEntry | null;
   };
+  alerts: WeatherAlert[];
 }
 
 export const getWeather = (name: string) =>
