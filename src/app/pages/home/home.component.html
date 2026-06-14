@@ -35,7 +35,20 @@
 
       <div class="map-stage">
         <div class="map-blob"></div>
-        <img class="map-img hero-map" [src]="themeService.mapSrc()" alt="Map of Texas">
+        <div class="map-wrap">
+          <img [src]="themeService.mapSrc()" alt="Map of Texas">
+          <div class="map-tags">
+            @for (city of sampleCities(); track city.properties.name) {
+              <a class="tag"
+                 [routerLink]="['/city', city.properties.name]"
+                 [style.left.%]="mapPos(city).left"
+                 [style.top.%]="mapPos(city).top">
+                <span class="pindot"></span>
+                {{ city.properties.name }}
+              </a>
+            }
+          </div>
+        </div>
       </div>
     </section>
 

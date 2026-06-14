@@ -1,4 +1,5 @@
 import type { APIGatewayProxyResultV2 } from 'aws-lambda'
+import { Document, WithId } from 'mongodb'
 
 export interface RouteContext {
   params: Record<string, string>
@@ -18,14 +19,12 @@ export interface Route {
 
 // ── MongoDB document shapes ──────────────────────────────────────────────────
 
-export interface CityDoc {
+export interface CityDoc extends WithId<Document> {
   properties: {
     name: string
+    intptlat: string
+    intptlon: string
   }
-  county:        string
-  state:         string
-  lat:           number
-  lon:           number
   population:    number
   timesSearched: number
   lastSearched:  string | null

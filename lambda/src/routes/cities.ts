@@ -1,4 +1,4 @@
-import type { RouteHandler } from '../types'
+import type { CityDoc, RouteHandler } from '../types'
 import { getDb } from '../db'
 import { ok, notFound, badRequest } from '../response'
 import { Collections } from '../collections'
@@ -119,7 +119,7 @@ export const getRecentSearched: RouteHandler = async ({ query, origin }) => {
     )
     .sort({ lastSearched: -1 })
     .limit(limit)
-    .toArray()
+    .toArray() as CityDoc[]
   return ok(docs.map(d => ({ name: d.properties.name, lastSearched: d.lastSearched })), origin)
 }
 
@@ -137,4 +137,63 @@ export const recordSearch: RouteHandler = async ({ params, origin }) => {
   )
   if (!result) return notFound(`No city found with name "${params.name}"`, origin)
   return ok({ name: result.properties.name, timesSearched: result.timesSearched }, origin)
+}
+
+/** GET /cities/sample - select random cities spaced apart on the map */
+export const getSample: RouteHandler = async () => {
+  function parseCoord(city: CityDoc): [number, number] {
+    return [parseFloat(city.properties.intptlon), parseFloat(city.properties.intptlat)]
+  }
+
+  const minDistanceMeters = 50000; 
+  const earthRadiusMeters = 6378100;
+  const distanceInRadians = minDistanceMeters / earthRadiusMeters;
+
+  const db = await getDb()
+  const city1 = await db.collection(Collections.city).aggregate([
+    { $sample: { size: 1 } }
+  ]).next() as CityDoc;
+  const coord1 = parseCoord(city1)
+  const city2 = await db.collection(Collections.city).aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: coord1 },
+        distanceField: "distanceFromCity1",
+        minDistance: minDistanceMeters, // Must be further than this
+        spherical: true
+      }
+    },
+    { $sample: { size: 1 } }
+  ]).next() as CityDoc
+  const coord2 = parseCoord(city2)
+  const city3 = await db.collection(Collections.city).aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: coord1 },
+        distanceField: "distanceFromCity1",
+        minDistance: minDistanceMeters,
+        spherical: true
+      }
+    },
+    {
+      $match: {
+        location: {
+          $not: {
+            $geoWithin: {
+              $centerSphere: [ coord2, distanceInRadians ]
+            }
+          }
+        }
+      }
+    },
+    {
+      $match: {
+        _id: { $nin: [ city1._id, city2._id ] }
+      }
+    },
+    { 
+      $sample: { size: 1 } 
+    }
+  ]).next() as CityDoc
+  return ok([city1, city2, city3])
 }

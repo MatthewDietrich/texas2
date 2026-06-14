@@ -27,7 +27,12 @@ export interface RecentCity {
   lastSearched: string
 }
 
+export interface SampleCity {
+  properties: { name: string; intptlat: string; intptlon: string }
+}
+
 export const getCityNames      = ()                   => get<string[]>('/cities')
+export const getSample         = ()                   => get<SampleCity[]>('/cities/sample')
 export const getCity           = (name: string)       => get<City>(`/cities/${encodeURIComponent(name)}`)
 export const getTopSearched    = (limit = 100)        => get<SearchedCity[]>(`/searches/top?limit=${limit}`)
 export const getRecentSearched = (limit = 10)         => get<RecentCity[]>(`/searches/recent?limit=${limit}`)

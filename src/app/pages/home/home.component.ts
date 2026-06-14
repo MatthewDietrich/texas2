@@ -2,8 +2,11 @@ import { Component, inject, signal, OnInit } from '@angular/core'
 import { RouterLink, Router } from '@angular/router'
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component'
 import { ThemeService } from '../../services/theme.service'
-import { getCityNames, getTopSearched, getRecentSearched, recordSearch } from '../../../api/cities'
-import type { SearchedCity, RecentCity } from '../../../api/cities'
+import { getCityNames, getSample, getTopSearched, getRecentSearched, recordSearch } from '../../../api/cities'
+import type { SearchedCity, RecentCity, SampleCity } from '../../../api/cities'
+
+// Texas geographic bounds — adjust if the map image has different framing
+const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 }
 
 @Component({
   selector: 'app-home',
@@ -17,6 +20,12 @@ import type { SearchedCity, RecentCity } from '../../../api/cities'
     .map-blob  { position:absolute; width:78%; aspect-ratio:1; border-radius:50%; background:var(--map-bg); filter:blur(2px); }
     .map-img.hero-map { position:relative; width:min(420px,80%); aspect-ratio:1; }
     .lists { display:grid; grid-template-columns:1fr 1fr; gap:var(--s7); margin-top:var(--s7); margin-bottom:var(--s7); }
+    .map-wrap { position:relative; width:min(420px,80%); aspect-ratio:1; }
+    .map-wrap img { width:100%; aspect-ratio:1; display:block; }
+    .map-tags { position:absolute; inset:0; pointer-events:none; }
+    .map-tags .tag { position:absolute; display:inline-flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-md); border-radius:var(--r-pill); padding:7px 13px 7px 10px; font-size:12.5px; font-weight:600; pointer-events:all; transition:border-color var(--ease),box-shadow var(--ease),transform var(--ease); white-space:nowrap; transform:translate(-50%,-50%); }
+    .map-tags .tag:hover { border-color:var(--accent); box-shadow:var(--shadow-lg); transform:translate(-50%,-54%); }
+    .map-tags .tag .pindot { width:8px; height:8px; border-radius:50%; background:var(--accent); flex:none; }
     @media (max-width:900px) {
       .hero { grid-template-columns:1fr; gap:var(--s6); padding:var(--s6) 0; }
       .map-stage { order:-1; min-height:240px; }
@@ -33,11 +42,22 @@ export class HomeComponent implements OnInit {
   cityNames      = signal<string[] | null>(null)
   topSearched    = signal<SearchedCity[] | null>(null)
   recentSearched = signal<RecentCity[] | null>(null)
+  sampleCities   = signal<SampleCity[]>([])
 
   ngOnInit(): void {
     getCityNames().then(n => this.cityNames.set(n)).catch(() => {})
     getTopSearched(5).then(t => this.topSearched.set(t)).catch(() => {})
     getRecentSearched(10).then(r => this.recentSearched.set(r)).catch(() => {})
+    getSample().then(s => this.sampleCities.set(s)).catch(() => {})
+  }
+
+  mapPos(city: SampleCity): { top: number; left: number } {
+    const lat = parseFloat(city.properties.intptlat)
+    const lon = parseFloat(city.properties.intptlon)
+    return {
+      left: (lon - TX.west)  / (TX.east  - TX.west)  * 100,
+      top:  (TX.north - lat) / (TX.north - TX.south) * 100,
+    }
   }
 
   handleSearch(value: string, event: Event): void {

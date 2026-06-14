@@ -3,7 +3,7 @@ import { MongoTopologyClosedError } from 'mongodb'
 import type { Route, RouteContext } from './types'
 import { notFound, serverError } from './response'
 import { resetClient } from './db'
-import { listCities, getCity, getTopSearched, getRecentSearched, recordSearch } from './routes/cities'
+import { listCities, getCity, getSample, getTopSearched, getRecentSearched, recordSearch } from './routes/cities'
 import { getCamera, getCamerasForCity, recordView } from './routes/cameras'
 import { refreshDistrict } from './routes/districts'
 import { refreshReservoirs } from './routes/reservoirs'
@@ -14,6 +14,7 @@ import { refreshReservoirs } from './routes/reservoirs'
 const ROUTES: Route[] = [
   // Cities — reads
   { method: 'GET',  pattern: /^\/cities$/,                     keys: [],       handler: listCities },
+  { method: 'GET',  pattern: /^\/cities\/sample$/,             keys: [],       handler: getSample },
   { method: 'GET',  pattern: /^\/cities\/([^/]+)$/,            keys: ['name'], handler: getCity },
   { method: 'GET',  pattern: /^\/cities\/([^/]+)\/cameras$/,   keys: ['name'], handler: getCamerasForCity },
   { method: 'GET',  pattern: /^\/searches\/top$/,              keys: [],       handler: getTopSearched },
