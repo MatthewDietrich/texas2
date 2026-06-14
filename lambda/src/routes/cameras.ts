@@ -38,10 +38,9 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
   return ok({ ...camera, snapshot }, origin)
 }
 
-const FIVE_MILES_METRES = 8047
-
-/** GET /cities/:name/cameras — cameras within 5 miles of the city's internal point */
+/** GET /cities/:name/cameras — cameras within 10 miles of the city's internal point */
 export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
+  const DISTANCE_METERS = 16093
   if (!params.name) return badRequest('City name is required', origin)
 
   const db   = await getDb()
@@ -62,7 +61,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
       $geoNear: {
         near:          { type: 'Point', coordinates: [lon, lat] },
         distanceField: 'dist',
-        maxDistance:   FIVE_MILES_METRES,
+        maxDistance:   DISTANCE_METERS,
         spherical:     true,
       },
     },
