@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core'
 import { RouterLink, Router } from '@angular/router'
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component'
 import { ThemeService } from '../../services/theme.service'
-import { getCityNames, getSample, getTopSearched, getRecentSearched, recordSearch } from '../../../api/cities'
+import { getCityNames, getSample, getTopSearched, getRecentSearched } from '../../../api/cities'
 import type { SearchedCity, RecentCity, SampleCity } from '../../../api/cities'
 
 // Texas geographic bounds — adjust if the map image has different framing
@@ -64,7 +64,6 @@ export class HomeComponent implements OnInit {
     event.preventDefault()
     const name = value.trim()
     if (!name) return
-    recordSearch(name).catch(() => {})
     this.router.navigate(['/city', name])
   }
 
@@ -72,7 +71,6 @@ export class HomeComponent implements OnInit {
     const names = this.cityNames()
     if (names?.length) {
       const pick = names[Math.floor(Math.random() * names.length)]
-      recordSearch(pick).catch(() => {})
       this.router.navigate(['/city', pick])
     }
   }

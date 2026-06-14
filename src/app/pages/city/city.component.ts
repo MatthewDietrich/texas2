@@ -2,7 +2,7 @@ import { Component, input, signal, effect, computed } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component'
 import { FooterComponent } from '../../components/footer/footer.component'
-import { getCity } from '../../../api/cities'
+import { getCity, recordSearch } from '../../../api/cities'
 import { getCamerasForCity } from '../../../api/cameras'
 import type { City } from '../../../api/cities'
 import type { Camera } from '../../../api/cameras'
@@ -71,6 +71,7 @@ export class CityComponent {
       const name = this.cityName()
       this.loadCity(name)
       this.loadCameras(name)
+      recordSearch(name).catch(() => {})
     })
   }
 
