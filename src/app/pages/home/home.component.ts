@@ -29,6 +29,10 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
       }
       .hero-copy {
         max-width: 540px;
+        min-width: 0;
+      }
+      .hero-copy .h-display {
+        overflow-wrap: break-word;
       }
       .map-stage {
         position: relative;
@@ -142,7 +146,7 @@ export class HomeComponent implements OnInit {
     getCityNames()
       .then((n) => this.cityNames.set(n))
       .catch(() => {});
-    getTopSearched(5)
+    getTopSearched(10)
       .then((t) => this.topSearched.set(t))
       .catch(() => {});
     getRecentSearched(10)
