@@ -1,42 +1,61 @@
-<div class="container-fluid d-flex flex-column">
+<div class="page">
   <app-nav-bar />
 
-  <main class="p-4">
-    <header class="text-center mb-4">
-      <h1>{{ cameraId() }}</h1>
-      @if (loading()) { <p>Loading…</p> }
-      @if (error()) { <p class="text-danger">{{ error() }}</p> }
-      @if (camera(); as cam) {
-        <p>{{ directionLabel[cam.direction] ?? cam.direction }} — District {{ cam.districtAbbreviation }}</p>
-        <p>{{ lat() }}° N, {{ lon() }}° W</p>
-      }
-    </header>
+  <main class="wrap grow">
+    <div class="cam-wrap">
+      <div class="cam-head">
+        <div>
+          @if (camera(); as cam) {
+            <div class="eyebrow mb2">Live road camera · {{ cam.districtAbbreviation }}</div>
+          }
+          <div class="cid">{{ cameraId() }}</div>
+          @if (loading()) { <div class="loc">Loading…</div> }
+          @if (error())   { <div class="loc" style="color:var(--accent)">{{ error() }}</div> }
+          @if (camera(); as cam) {
+            <div class="loc">{{ direction[cam.direction] ?? cam.direction }} · {{ lat() }}°N {{ lon() }}°W</div>
+          }
+        </div>
+        <span class="alert calm" style="font-size:13px">
+          <svg class="ic"><use href="#i-check"></use></svg> Refreshed every 5 min
+        </span>
+      </div>
 
-    <div class="d-flex flex-column align-items-center py-4">
-      <div class="img-container-lg">
+      <div class="big-shot">
         @if (camera()?.snapshot) {
-          <img
-            [src]="'data:image/jpeg;base64,' + camera()!.snapshot"
-            [alt]="'Traffic camera ' + cameraId()"
-            style="width:100%;border-radius:var(--border-radius)"
-          />
+          <img [src]="'data:image/jpeg;base64,' + camera()!.snapshot" [alt]="'Traffic camera ' + cameraId()">
         } @else {
-          <div style="width:100%;padding-bottom:56.25%;background:var(--secondary-bg);position:relative;border-radius:var(--border-radius)">
-            <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-              {{ loading() ? 'Loading…' : 'No snapshot available' }}
-            </span>
-          </div>
+          <span class="ph">{{ loading() ? 'Loading…' : 'No snapshot available' }}</span>
         }
       </div>
-      @if (camera()?.lastViewed; as lv) {
-        <p class="mt-2"><small>Last viewed {{ formatDate(lv) }}</small></p>
-      }
+
+      <div class="meta-grid">
+        <div class="card meta-card">
+          <div class="k"><svg class="ic"><use href="#i-car"></use></svg> Direction</div>
+          <div class="v">{{ direction[camera()?.direction ?? ''] ?? camera()?.direction ?? '—' }}</div>
+        </div>
+        <div class="card meta-card">
+          <div class="k"><svg class="ic"><use href="#i-layers"></use></svg> District</div>
+          <div class="v">{{ camera()?.districtAbbreviation ?? '—' }}</div>
+        </div>
+        <div class="card meta-card">
+          <div class="k"><svg class="ic"><use href="#i-pin"></use></svg> Coordinates</div>
+          <div class="v">{{ lat() }}°N {{ lon() }}°W</div>
+        </div>
+        <div class="card meta-card">
+          <div class="k"><svg class="ic"><use href="#i-eye"></use></svg> Times viewed</div>
+          <div class="v">{{ camera()?.timesViewed?.toLocaleString() ?? '—' }}</div>
+        </div>
+      </div>
     </div>
   </main>
 
   <app-footer>
-    @if (camera(); as cam) {
-      <p class="mb-2">Viewed {{ cam.timesViewed.toLocaleString() }} times</p>
-    }
+    <div class="foot-src">
+      <a (click)="$event.preventDefault()" style="cursor:pointer" onclick="history.back()">← Back</a>
+      @if (camera()?.lastViewed) {
+        <span class="subtle">Last viewed {{ formatDate(camera()!.lastViewed!) }}</span>
+      }
+      <span class="subtle" style="margin-left:auto">Snapshot from the Texas Department of Transportation · © Texas City Snapshot</span>
+    </div>
   </app-footer>
 </div>

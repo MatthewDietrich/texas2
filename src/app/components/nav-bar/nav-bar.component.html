@@ -1,39 +1,43 @@
-<header>
-  @if (variant() === 'home') {
-    <nav class="d-flex align-items-center p-2">
-      <span class="fw-bold">Texas City Snapshot</span>
-      <div class="ms-auto d-flex align-items-center gap-3">
-        <a routerLink="/mostsearched" aria-label="Leaderboard">
-          <span class="material-symbols-outlined">leaderboard</span>
-        </a>
-        <details>
-          <summary><span class="material-symbols-outlined">palette</span></summary>
-          <ul>
-            @for (t of themes; track t.value) {
-              <li><button (click)="themeService.setTheme(t.value)">{{ t.label }}</button></li>
-            }
-          </ul>
-        </details>
-      </div>
-    </nav>
-  } @else {
-    <nav class="d-flex align-items-center p-2">
-      <button class="btn p-0" (click)="goBack()" aria-label="Go back">
-        <span class="material-symbols-outlined">arrow_back</span>
+<header class="nav">
+  <div class="wrap nav-inner">
+    @if (variant() === 'page') {
+      <button class="icon-btn" (click)="goBack()" aria-label="Back">
+        <svg class="ic"><use href="#i-back"></use></svg>
       </button>
-      <a routerLink="/" class="ms-2" aria-label="Home">
-        <span class="material-symbols-outlined">home</span>
+    }
+
+    <a class="brand" routerLink="/">
+      <img class="mark" [src]="themeService.mapSrc()" alt="">
+      Texas City Snapshot
+    </a>
+
+    <div class="nav-actions">
+      @if (variant() === 'page') {
+        <a class="icon-btn" routerLink="/" aria-label="Home">
+          <svg class="ic"><use href="#i-home"></use></svg>
+        </a>
+      }
+      <a class="icon-btn" routerLink="/mostsearched" aria-label="Leaderboard">
+        <svg class="ic"><use href="#i-trophy"></use></svg>
       </a>
-      <div class="ms-auto">
-        <details>
-          <summary><span class="material-symbols-outlined">palette</span></summary>
-          <ul>
-            @for (t of themes; track t.value) {
-              <li><button (click)="themeService.setTheme(t.value)">{{ t.label }}</button></li>
-            }
-          </ul>
-        </details>
+      <div class="swatches" role="group" aria-label="Color theme">
+        @for (t of themes; track t.value) {
+          <button
+            class="swatch {{ t.cls }}"
+            [attr.aria-pressed]="themeService.theme() === t.value"
+            [attr.aria-label]="t.label"
+            (click)="themeService.setTheme(t.value)"
+          ></button>
+        }
       </div>
-    </nav>
-  }
+      <span class="nav-divider"></span>
+      <button class="icon-btn" (click)="themeService.toggleMode()" aria-label="Toggle light or dark">
+        @if (themeService.mode() === 'light') {
+          <svg class="ic"><use href="#i-moon"></use></svg>
+        } @else {
+          <svg class="ic"><use href="#i-sun"></use></svg>
+        }
+      </button>
+    </div>
+  </div>
 </header>

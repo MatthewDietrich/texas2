@@ -1,45 +1,55 @@
-<div class="container-fluid d-flex flex-column">
+<div class="page">
   <app-nav-bar />
 
-  <main class="p-4">
-    <h1 class="mb-3">About</h1>
-    <p class="mb-4">
-      Texas City Snapshot aggregates publicly available weather, traffic camera,
-      water reservoir, and transportation data for cities and towns across Texas.
-    </p>
+  <main class="wrap grow">
+    <div class="about-wrap">
+      <div class="about-hero">
+        <div>
+          <div class="eyebrow mb2">About this app</div>
+          <h1 class="h-display" style="font-size:clamp(34px,5vw,52px)">One calm window onto Texas.</h1>
+        </div>
+      </div>
 
-    <section class="mb-4">
-      <h2 class="h4">Weather</h2>
-      <ul>
-        <li>Forecasts and historical data provided by <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>.</li>
-        <li>Alerts provided by the <a href="https://weather.gov" target="_blank" rel="noreferrer">National Weather Service</a>.</li>
-        <li>Updated every 5 minutes.</li>
-      </ul>
-    </section>
+      <div class="prose mb7">
+        <p>Texas City Snapshot gathers publicly available weather, traffic-camera, water-reservoir,
+        and transportation data for every city and town across Texas, and lays it out in one quiet,
+        fast place — no clutter, no accounts, no ads.</p>
+      </div>
 
-    <section class="mb-4">
-      <h2 class="h4">Road Camera Snapshots</h2>
-      <ul>
-        <li>Snapshots provided by <a href="https://txdot.gov" target="_blank" rel="noreferrer">Texas DOT</a>.</li>
-        <li>Updated every 5 minutes.</li>
-      </ul>
-    </section>
+      <h2 class="card-title mb4">Where the data comes from</h2>
+      <div class="src-grid">
+        <div class="card src-card">
+          <h3><span class="wi" style="font-size:18px">&#xf00d;</span> Weather</h3>
+          <p>Forecasts &amp; history from <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>;
+          alerts from the <a href="https://weather.gov" target="_blank" rel="noreferrer">National Weather Service</a>.</p>
+          <div class="freq">Updated every 5 minutes</div>
+        </div>
+        <div class="card src-card">
+          <h3><svg class="ic"><use href="#i-camera"></use></svg> Road cameras</h3>
+          <p>Live snapshots from the <a href="https://txdot.gov" target="_blank" rel="noreferrer">Texas Department of Transportation</a>.</p>
+          <div class="freq">Updated every 5 minutes</div>
+        </div>
+        <div class="card src-card">
+          <h3><svg class="ic"><use href="#i-droplet"></use></svg> Water reservoirs</h3>
+          <p>Reservoir levels from <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>.</p>
+          <div class="freq">Updated every 24 hours</div>
+        </div>
+        <div class="card src-card">
+          <h3><svg class="ic"><use href="#i-users"></use></svg> Population</h3>
+          <p>City population figures sourced from the 2020 US Census.</p>
+          <div class="freq">Static dataset</div>
+        </div>
+      </div>
 
-    <section class="mb-4">
-      <h2 class="h4">Population</h2>
-      <ul>
-        <li>Population figures sourced from the 2020 US Census.</li>
-      </ul>
-    </section>
-
-    <section class="mb-4">
-      <h2 class="h4">Water Reservoirs</h2>
-      <ul>
-        <li>Reservoir levels provided by <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>.</li>
-        <li>Updated every 24 hours.</li>
-      </ul>
-    </section>
+      <div class="divider mt7 mb6"></div>
+      <p class="subtle" style="font-size:14px">Open data, gathered with care.</p>
+    </div>
   </main>
 
-  <app-footer />
+  <app-footer>
+    <div class="foot-src">
+      <a routerLink="/">← Back to search</a>
+      <span class="subtle">© Texas City Snapshot</span>
+    </div>
+  </app-footer>
 </div>

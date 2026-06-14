@@ -6,10 +6,10 @@ import { RouterLink } from '@angular/router'
   standalone: true,
   imports: [RouterLink],
   template: `
-    <footer class="p-4 text-center">
-      <ng-content />
-      <p><a routerLink="/">Back to search</a></p>
-      <small>&copy; Texas City Snapshot</small>
+    <footer class="foot">
+      <div class="wrap">
+        <ng-content />
+      </div>
     </footer>
   `,
 })

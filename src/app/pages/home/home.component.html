@@ -1,67 +1,97 @@
-<div class="container-fluid d-flex flex-column" style="min-height: 100vh">
+<div class="page">
   <app-nav-bar variant="home" />
 
-  <main class="d-flex flex-row flex-grow-1 p-2">
-    <div class="d-flex flex-column p-4" style="max-width: 420px">
-      <h1 class="visually-hidden">Texas City Snapshot</h1>
+  <main class="wrap grow">
+    <section class="hero">
+      <div class="hero-copy">
+        <h1 class="h-display">Enter the name of a city or town in Texas</h1>
+        <p class="muted mt4" style="font-size:18px;max-width:440px">
+          Current weather, road camera snapshots, and reservoir levels for any city or town in Texas — pulled fresh and put in one calm place.
+        </p>
 
-      <form class="d-flex gap-2 mb-4" (submit)="handleSearch(cityInput.value, $event)">
-        <input
-          #cityInput
-          type="text"
-          id="city-name"
-          list="city-names"
-          class="form-control"
-          placeholder="City name…"
-          autocomplete="off"
-        />
-        <datalist id="city-names">
-          @for (name of cityNames() ?? []; track name) {
-            <option [value]="name"></option>
-          }
-        </datalist>
-        <button type="submit" class="btn" id="submit-button" aria-label="Search">
-          <span class="material-symbols-outlined">search</span>
-        </button>
-        <button type="button" class="btn" id="random-button" aria-label="Random city" (click)="handleRandom()">
-          <span class="material-symbols-outlined">casino</span>
-        </button>
-      </form>
-
-      <div class="d-flex flex-row gap-4">
-        <div>
-          <h2 class="h5">Most Searched</h2>
-          <ol>
-            @if (topSearched(); as top) {
-              @for (c of top; track c.name) {
-                <li><a [routerLink]="['/city', c.name]">{{ c.name }}</a></li>
-              }
-            } @else {
-              <li><em>Loading…</em></li>
+        <form class="searchbar mt6" (submit)="handleSearch(cityInput.value, $event)">
+          <svg class="ic lead"><use href="#i-search"></use></svg>
+          <input
+            #cityInput
+            type="text"
+            list="city-names"
+            placeholder='Search a city — try "Austin"…'
+            aria-label="City name"
+            autocomplete="off"
+          />
+          <datalist id="city-names">
+            @for (name of cityNames() ?? []; track name) {
+              <option [value]="name"></option>
             }
-          </ol>
+          </datalist>
+          <button class="search-icon-btn" type="button" aria-label="Random city" title="Surprise me" (click)="handleRandom()">
+            <svg class="ic"><use href="#i-dice"></use></svg>
+          </button>
+          <button class="search-icon-btn go" type="submit" aria-label="Search">
+            <svg class="ic"><use href="#i-search"></use></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="map-stage">
+        <div class="map-blob"></div>
+        <img class="map-img hero-map" [src]="themeService.mapSrc()" alt="Map of Texas">
+      </div>
+    </section>
+
+    <section class="lists">
+      <div>
+        <div class="flex between center mb4">
+          <h2 class="card-title">
+            <svg class="ic" style="width:14px;height:14px;color:var(--accent)"><use href="#i-trophy"></use></svg>
+            Most searched
+          </h2>
+          <a class="subtle" routerLink="/mostsearched" style="font-size:13px">View all →</a>
         </div>
-        <div>
-          <h2 class="h5">Recently Searched</h2>
-          <ol>
-            @if (recentSearched()?.length) {
-              @for (c of recentSearched()!; track c.name) {
-                <li><a [routerLink]="['/city', c.name]">{{ c.name }}</a></li>
-              }
-            } @else {
-              <li><em>No recent searches</em></li>
+        <div class="rank-list">
+          @if (topSearched(); as top) {
+            @for (c of top; track c.name; let i = $index) {
+              <a class="rank-row" [routerLink]="['/city', c.name]">
+                <span class="n">{{ i + 1 }}</span>
+                <span class="city">{{ c.name }}</span>
+                <span class="meta">{{ c.timesSearched.toLocaleString() }}</span>
+              </a>
             }
-          </ol>
+          } @else {
+            <p class="muted" style="padding:var(--s3) var(--s2)">Loading…</p>
+          }
         </div>
       </div>
-    </div>
 
-    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
-      <img id="texas-map" src="assets/texas.png" alt="Map of Texas" style="cursor: crosshair" />
-    </div>
+      <div>
+        <div class="flex between center mb4">
+          <h2 class="card-title">
+            <svg class="ic" style="width:14px;height:14px;color:var(--accent)"><use href="#i-clock"></use></svg>
+            Recently searched
+          </h2>
+        </div>
+        <div class="rank-list">
+          @if (recentSearched()?.length) {
+            @for (c of recentSearched()!; track c.name) {
+              <a class="rank-row" [routerLink]="['/city', c.name]">
+                <span class="n">·</span>
+                <span class="city">{{ c.name }}</span>
+                <span class="meta">{{ timeAgo(c.lastSearched) }}</span>
+              </a>
+            }
+          } @else {
+            <p class="subtle" style="padding:var(--s3) var(--s2)">No recent searches</p>
+          }
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="p-2 text-center">
-    <a routerLink="/about">About this app</a>
+  <footer class="foot">
+    <div class="wrap foot-src">
+      <span>Texas City Snapshot</span>
+      <span class="subtle">254 counties · 1,200+ live cameras · refreshed every 5 min</span>
+      <a routerLink="/about" style="margin-left:auto">About this app</a>
+    </div>
   </footer>
 </div>

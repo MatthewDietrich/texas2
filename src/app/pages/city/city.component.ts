@@ -7,25 +7,38 @@ import { getCamerasForCity } from '../../../api/cameras'
 import type { City } from '../../../api/cities'
 import type { Camera } from '../../../api/cameras'
 
-const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i)
+type Tab = 'snap' | 'weather' | 'water' | 'trans'
 
-const HOURLY = Array.from({ length: 12 }, (_, i) => ({ hour: `${(8 + i) % 24}:00` }))
+const HOURLY = Array.from({ length: 10 }, (_, i) => ({
+  hour: i === 0 ? 'Now' : `${(new Date().getHours() + i) % 24}:00`,
+}))
 
 const FORECAST = [
-  { day: 'Mon' }, { day: 'Tue' }, { day: 'Wed' }, { day: 'Thu' },
-  { day: 'Fri' }, { day: 'Sat' }, { day: 'Sun' },
+  { day: 'Today' }, { day: 'Sat' }, { day: 'Sun' },
+  { day: 'Mon'   }, { day: 'Tue' }, { day: 'Wed' }, { day: 'Thu' },
 ]
 
-const ALMANAC_ROWS = [
-  'Condition', 'High', 'Low', 'Total Precip.', 'Avg. Humidity',
-  'Avg. Cloud Cover', 'Avg. Wind', 'Pressure', 'Sunrise', 'Sunset',
-]
+const ALMANAC_ROWS = ['High', 'Low', 'Precip.']
+
+const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i)
 
 @Component({
   selector: 'app-city',
   standalone: true,
   imports: [RouterLink, NavBarComponent, FooterComponent],
   templateUrl: './city.component.html',
+  styles: [`
+    .city-head { display:grid; grid-template-columns:1fr; gap:var(--s5); align-items:center; padding:var(--s7) 0 var(--s6); }
+    .tabbar { display:flex; align-items:center; justify-content:space-between; gap:var(--s4); flex-wrap:wrap; margin-bottom:var(--s5); }
+    .panels { padding-bottom:var(--s8); }
+    .src-line { color:var(--text-subtle); font-size:13px; }
+    .src-line a { color:var(--text-muted); text-decoration:underline; text-underline-offset:2px; }
+    @media (max-width:760px) {
+      .city-head { padding:var(--s6) 0 var(--s5); }
+      .statrow { gap:var(--s5); }
+      .segtabs { width:100%; overflow-x:auto; }
+    }
+  `],
 })
 export class CityComponent {
   readonly cityName = input.required<string>()
@@ -37,10 +50,12 @@ export class CityComponent {
   camsLoading = signal(true)
   camsError   = signal<string | null>(null)
 
+  activeTab = signal<Tab>('snap')
+
+  readonly hourly           = HOURLY
+  readonly forecast         = FORECAST
+  readonly almanacRows      = ALMANAC_ROWS
   readonly cameraPlaceholders = CAMERA_PLACEHOLDERS
-  readonly hourly             = HOURLY
-  readonly forecast    = FORECAST
-  readonly almanacRows = ALMANAC_ROWS
 
   readonly lat = computed(() => {
     const c = this.city()

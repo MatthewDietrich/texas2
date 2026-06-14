@@ -3,13 +3,6 @@ import { RouterLink } from '@angular/router'
 import { Location } from '@angular/common'
 import { ThemeService, type Theme } from '../../services/theme.service'
 
-const THEMES: { value: Theme; label: string }[] = [
-  { value: 'default',     label: 'Default Green' },
-  { value: 'burntorange', label: 'Burnt Orange'  },
-  { value: 'maroon',      label: 'Maroon'        },
-  { value: 'purple',      label: 'Purple'        },
-]
-
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -18,9 +11,15 @@ const THEMES: { value: Theme; label: string }[] = [
 })
 export class NavBarComponent {
   readonly variant      = input<'home' | 'page'>('page')
-  readonly themes       = THEMES
   readonly themeService = inject(ThemeService)
   private  location     = inject(Location)
+
+  readonly themes: { value: Theme; label: string; cls: string }[] = [
+    { value: 'green',  label: 'Green',       cls: 'sw-green'  },
+    { value: 'orange', label: 'Burnt orange', cls: 'sw-orange' },
+    { value: 'maroon', label: 'Maroon',       cls: 'sw-maroon' },
+    { value: 'purple', label: 'Purple',       cls: 'sw-purple' },
+  ]
 
   goBack(): void { this.location.back() }
 }
