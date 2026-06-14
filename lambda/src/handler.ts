@@ -15,6 +15,7 @@ import {
   recordSearch,
 } from "./routes/cities";
 import { getCamera, getCamerasForCity, recordView } from "./routes/cameras";
+import { getWeather } from "./routes/weather";
 import { refreshDistrict } from "./routes/districts";
 import { refreshReservoirs } from "./routes/reservoirs";
 
@@ -41,6 +42,12 @@ const ROUTES: Route[] = [
     pattern: /^\/cities\/([^/]+)\/cameras$/,
     keys: ["name"],
     handler: getCamerasForCity,
+  },
+  {
+    method: "GET",
+    pattern: /^\/cities\/([^/]+)\/weather$/,
+    keys: ["name"],
+    handler: getWeather,
   },
   {
     method: "GET",

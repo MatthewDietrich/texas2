@@ -1,8 +1,5 @@
 const DISTRICT_BASE = "https://its.txdot.gov/its/DistrictIts";
 
-// ── TxDOT response shapes ────────────────────────────────────────────────────
-// Verify field names by logging the raw response against a real district code.
-
 export interface TxDotCameraStatus {
   icdId: string;
   direction: string;
@@ -16,8 +13,6 @@ export interface TxDotCameraSnapshot {
   snippet: string;
   timestampFormatted: string;
 }
-
-// ── API calls ────────────────────────────────────────────────────────────────
 
 export async function getCctvListByDistrict(
   districtCode: string,

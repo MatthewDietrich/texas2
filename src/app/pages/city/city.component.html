@@ -127,106 +127,165 @@
 
       <!-- WEATHER -->
       <section class="tabpanel" [class.active]="activeTab() === 'weather'">
-        <div class="card card-pad mb5">
-          <div class="now-card">
-            <div class="now-temp">
-              <span class="wi">&#xf00d;</span>
-              <div>
-                <div class="deg">—°</div>
-                <div class="cond">
-                  <div class="c">—</div>
-                  <div class="f">Feels like —</div>
+        @if (weatherLoading()) {
+          <p class="muted mt4">Loading weather…</p>
+        } @else if (weatherError()) {
+          <p style="color: var(--accent)">{{ weatherError() }}</p>
+        } @else if (weather(); as w) {
+          <div class="card card-pad mb5">
+            <div class="now-card">
+              <div class="now-temp">
+                <span class="wi">{{
+                  wmoIcon(w.current.weatherCode, w.current.isDay)
+                }}</span>
+                <div>
+                  <div class="deg">{{ w.current.tempF }}°</div>
+                  <div class="cond">
+                    <div class="c">{{ wmoLabel(w.current.weatherCode) }}</div>
+                    <div class="f">Feels like {{ w.current.feelsLikeF }}°</div>
+                  </div>
+                </div>
+              </div>
+              <div class="now-grid">
+                <div class="metric">
+                  <span class="k"
+                    ><span class="wi">&#xf07a;</span> Humidity</span
+                  >
+                  <span class="v">{{ w.current.humidity }}%</span>
+                </div>
+                <div class="metric">
+                  <span class="k"
+                    ><span class="wi">&#xf04e;</span> Precip.</span
+                  >
+                  <span class="v">{{ w.current.precipProbability }}%</span>
+                </div>
+                <div class="metric">
+                  <span class="k"
+                    ><span class="wi">&#xf041;</span> Cloud cover</span
+                  >
+                  <span class="v">{{ w.current.cloudCover }}%</span>
+                </div>
+                <div class="metric">
+                  <span class="k"><span class="wi">&#xf050;</span> Wind</span>
+                  <span class="v"
+                    >{{ w.current.windMph }} mph
+                    {{ windDirLabel(w.current.windDir) }}</span
+                  >
+                </div>
+                <div class="metric">
+                  <span class="k"
+                    ><span class="wi">&#xf079;</span> Pressure</span
+                  >
+                  <span class="v">{{ w.current.pressureMb }} mb</span>
+                </div>
+                <div class="metric">
+                  <span class="k"
+                    ><span class="wi">&#xf055;</span> Dew point</span
+                  >
+                  <span class="v">{{ w.current.dewPointF }}°</span>
                 </div>
               </div>
             </div>
-            <div class="now-grid">
-              <div class="metric">
-                <span class="k"><span class="wi">&#xf07a;</span> Humidity</span
-                ><span class="v">—</span>
-              </div>
-              <div class="metric">
-                <span class="k"><span class="wi">&#xf04e;</span> Precip.</span
-                ><span class="v">—</span>
-              </div>
-              <div class="metric">
-                <span class="k"
-                  ><span class="wi">&#xf041;</span> Cloud cover</span
-                ><span class="v">—</span>
-              </div>
-              <div class="metric">
-                <span class="k"><span class="wi">&#xf050;</span> Wind</span
-                ><span class="v">—</span>
-              </div>
-              <div class="metric">
-                <span class="k"><span class="wi">&#xf079;</span> Pressure</span
-                ><span class="v">—</span>
-              </div>
-              <div class="metric">
-                <span class="k"><span class="wi">&#xf055;</span> Dew point</span
-                ><span class="v">—</span>
-              </div>
-            </div>
           </div>
-        </div>
 
-        <h3 class="card-title mb4">Next 12 hours</h3>
-        <div class="hourly mb6">
-          @for (h of hourly; track h.hour) {
-            <div class="hour">
-              <div class="t">{{ h.hour }}</div>
-              <span class="wi">&#xf00d;</span>
-              <div class="deg">—</div>
-              <div class="pp">—</div>
-            </div>
-          }
-        </div>
-
-        <div
-          style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5)"
-        >
-          <div>
-            <h3 class="card-title mb4">7-day forecast</h3>
-            <div class="card card-pad">
-              <div class="forecast">
-                @for (f of forecast; track f.day) {
-                  <div class="fc-row">
-                    <span class="fc-day">{{ f.day }}</span>
-                    <span class="wi">&#xf00d;</span>
-                    <span class="fc-bar"></span>
-                    <span class="fc-temps"
-                      ><span>—</span><span class="lo">—</span></span
-                    >
-                  </div>
-                }
+          <h3 class="card-title mb4">Next 12 hours</h3>
+          <div class="hourly mb6">
+            @for (h of w.hourly; track h.time; let i = $index) {
+              <div class="hour" [class.peak]="i === 0">
+                <div class="t">{{ hourLabel(h.time, i) }}</div>
+                <span class="wi">{{ wmoIcon(h.weatherCode, h.isDay) }}</span>
+                <div class="deg">{{ h.tempF }}°</div>
+                <div class="pp">{{ h.precipProbability }}%</div>
               </div>
-            </div>
+            }
           </div>
-          <div>
-            <h3 class="card-title mb4">On this day — historical</h3>
-            <div class="card card-pad">
-              <table class="dtable" style="font-size: 14px">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th class="num">1 yr</th>
-                    <th class="num">5 yr</th>
-                    <th class="num">10 yr</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (row of almanacRows; track row) {
-                    <tr>
-                      <td>{{ row }}</td>
-                      <td class="num">—</td>
-                      <td class="num">—</td>
-                      <td class="num">—</td>
-                    </tr>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: var(--s5);
+            "
+          >
+            <div>
+              <h3 class="card-title mb4">7-day forecast</h3>
+              <div class="card card-pad">
+                <div class="forecast">
+                  @for (f of w.daily; track f.date; let i = $index) {
+                    <div class="fc-row">
+                      <span class="fc-day">{{ dayLabel(f.date, i) }}</span>
+                      <span class="wi">{{ wmoIcon(f.weatherCode, true) }}</span>
+                      <span
+                        class="fc-bar"
+                        [style.margin-left.%]="barLeft(f)"
+                        [style.width.%]="barWidth(f)"
+                      ></span>
+                      <span class="fc-temps"
+                        ><span>{{ f.highF }}°</span
+                        ><span class="lo">{{ f.lowF }}°</span></span
+                      >
+                    </div>
                   }
-                </tbody>
-              </table>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="card-title mb4">On this day — historical</h3>
+              <div class="card card-pad">
+                <table class="dtable" style="font-size: 14px">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th class="num">1 yr</th>
+                      <th class="num">5 yr</th>
+                      <th class="num">10 yr</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>High</td>
+                      <td class="num">
+                        {{ w.almanac.yr1 ? w.almanac.yr1.highF + "°" : "—" }}
+                      </td>
+                      <td class="num">
+                        {{ w.almanac.yr5 ? w.almanac.yr5.highF + "°" : "—" }}
+                      </td>
+                      <td class="num">
+                        {{ w.almanac.yr10 ? w.almanac.yr10.highF + "°" : "—" }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Low</td>
+                      <td class="num">
+                        {{ w.almanac.yr1 ? w.almanac.yr1.lowF + "°" : "—" }}
+                      </td>
+                      <td class="num">
+                        {{ w.almanac.yr5 ? w.almanac.yr5.lowF + "°" : "—" }}
+                      </td>
+                      <td class="num">
+                        {{ w.almanac.yr10 ? w.almanac.yr10.lowF + "°" : "—" }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Precip.</td>
+                      <td class="num">
+                        {{ w.almanac.yr1 ? w.almanac.yr1.precipIn + '"' : "—" }}
+                      </td>
+                      <td class="num">
+                        {{ w.almanac.yr5 ? w.almanac.yr5.precipIn + '"' : "—" }}
+                      </td>
+                      <td class="num">
+                        {{
+                          w.almanac.yr10 ? w.almanac.yr10.precipIn + '"' : "—"
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        }
         <p class="src-line mt5">
           Forecasts by
           <a href="https://open-meteo.com" target="_blank" rel="noreferrer"
