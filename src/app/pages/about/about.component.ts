@@ -17,6 +17,21 @@ import { FooterComponent } from "../../components/footer/footer.component";
       .about-hero {
         margin-bottom: var(--s7);
       }
+      .faq {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+        max-width: 680px;
+      }
+      .faq-ans {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+      .faq-ans a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
     `,
   ],
 })
