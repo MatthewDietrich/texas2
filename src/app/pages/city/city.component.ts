@@ -47,6 +47,11 @@ const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
         text-decoration: underline;
         text-underline-offset: 2px;
       }
+      .wx-2col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--s5);
+      }
       @media (max-width: 760px) {
         .city-head {
           padding: var(--s6) 0 var(--s5);
@@ -57,6 +62,9 @@ const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
         .segtabs {
           width: 100%;
           overflow-x: auto;
+        }
+        .wx-2col {
+          grid-template-columns: 1fr;
         }
       }
     `,
