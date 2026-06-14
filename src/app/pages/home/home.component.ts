@@ -35,6 +35,7 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
         display: grid;
         place-items: center;
         min-height: 360px;
+        overflow: hidden;
       }
       .map-blob {
         position: absolute;

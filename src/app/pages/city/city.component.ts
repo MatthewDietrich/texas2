@@ -67,9 +67,10 @@ const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
           grid-template-columns: 1fr;
         }
         .now-grid {
+          flex-basis: 100%;
           min-width: 0;
-          gap: var(--s3) var(--s4);
-          grid-template-columns: repeat(2, 1fr);
+          gap: 0;
+          grid-template-columns: 1fr;
         }
       }
     `,
