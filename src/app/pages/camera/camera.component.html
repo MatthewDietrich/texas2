@@ -6,9 +6,7 @@
       <div class="cam-head">
         <div>
           @if (camera(); as cam) {
-            <div class="eyebrow mb2">
-              Live road camera · {{ cam.districtAbbreviation }}
-            </div>
+            <div class="eyebrow mb2">Road camera snapshot</div>
           }
           <div class="cid">{{ cameraId() }}</div>
           @if (loading()) {
@@ -16,12 +14,6 @@
           }
           @if (error()) {
             <div class="loc" style="color: var(--accent)">{{ error() }}</div>
-          }
-          @if (camera(); as cam) {
-            <div class="loc">
-              {{ direction[cam.direction] ?? cam.direction }} · {{ lat() }}°N
-              {{ lon() }}°W
-            </div>
           }
         </div>
         <span class="alert calm" style="font-size: 13px">
@@ -44,16 +36,6 @@
       </div>
 
       <div class="meta-grid">
-        <div class="card meta-card">
-          <div class="k">
-            <svg class="ic"><use href="#i-car"></use></svg> Direction
-          </div>
-          <div class="v">
-            {{
-              direction[camera()?.direction ?? ""] ?? camera()?.direction ?? "—"
-            }}
-          </div>
-        </div>
         <div class="card meta-card">
           <div class="k">
             <svg class="ic"><use href="#i-layers"></use></svg> District

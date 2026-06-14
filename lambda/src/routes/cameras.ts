@@ -84,7 +84,7 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
         },
       },
       { $limit: NUM_CAMERAS },
-      { $sort: "dist" },
+      { $sort: { dist: 1 } },
       { $project: { _id: 0, dist: 0 } },
     ])
     .toArray();
