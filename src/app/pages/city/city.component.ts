@@ -66,6 +66,11 @@ const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
         .wx-2col {
           grid-template-columns: 1fr;
         }
+        .now-grid {
+          min-width: 0;
+          gap: var(--s3) var(--s4);
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
     `,
   ],
@@ -86,6 +91,11 @@ export class CityComponent {
   activeTab = signal<Tab>("snap");
 
   readonly cameraPlaceholders = CAMERA_PLACEHOLDERS;
+  readonly almanacLabel = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
 
   readonly lat = computed(() => {
     const c = this.city();
