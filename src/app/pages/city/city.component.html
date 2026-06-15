@@ -6,8 +6,11 @@
       <div>
         @if (city(); as c) {
           <div class="eyebrow mb2">{{ c.county }} County, Texas</div>
+          <h1 class="h-display">{{ c.properties.name }}</h1>
         }
-        <h1 class="h-display">{{ cityName() }}</h1>
+        @else {
+          <h1 class="h-display">{{ cityName() }}</h1>
+        }
         @if (cityLoading()) {
           <p class="muted mt4">Loading…</p>
         }
