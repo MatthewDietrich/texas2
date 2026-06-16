@@ -6,7 +6,7 @@ export interface NearbyAirport {
 }
 
 export interface NearbyHighway {
-  name: string;
+  name: string | null;
   distanceMiles: number;
 }
 

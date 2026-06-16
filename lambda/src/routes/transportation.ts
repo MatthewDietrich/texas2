@@ -52,7 +52,7 @@ export const getTransportationForCity: RouteHandler = async ({
         {
           $project: {
             _id: 0,
-            name: "$properties.AIRPRT_NM",
+            name: "$properties.ARPRT_NM",
             distanceMiles: { $divide: ["$dist", METERS_PER_MILE] },
           },
         },
@@ -66,6 +66,7 @@ export const getTransportationForCity: RouteHandler = async ({
             near,
             key: "geometry",
             distanceField: "dist",
+            query: { name: { $ne: null } },
             maxDistance: HIGHWAY_RADIUS_MILES * METERS_PER_MILE,
             spherical: true,
           },

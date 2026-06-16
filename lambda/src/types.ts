@@ -55,7 +55,7 @@ export interface AirportDoc extends WithId<Document> {
   };
   properties: {
     GID: number;
-    AIRPRT_NM: string;
+    ARPRT_NM: string;
   };
 }
 
