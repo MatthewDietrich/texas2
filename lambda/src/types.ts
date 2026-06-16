@@ -27,8 +27,8 @@ export interface CityDoc extends WithId<Document> {
     intptlat: string;
     intptlon: string;
   };
-  population: number;
-  timesSearched: number;
+  population: number | null;
+  timesSearched: number | null;
   lastSearched: string | null;
   nearby: string[];
 }
