@@ -10,8 +10,8 @@ export interface City {
   state: string;
   lat: number;
   lon: number;
-  population: number;
-  timesSearched: number;
+  population: number | null;
+  timesSearched: number | null;
   lastSearched: string | null;
   nearby?: string[];
   reservoirs?: {

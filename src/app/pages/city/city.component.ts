@@ -108,11 +108,11 @@ export class CityComponent {
   });
   readonly population = computed(() => {
     const c = this.city();
-    return c ? c.population.toLocaleString() : ""
+    return c?.population?.toLocaleString() || ""
   });
   readonly timesSearched = computed(() => {
     const c = this.city();
-    return c ? c.timesSearched.toLocaleString() : ""
+    return c?.timesSearched?.toLocaleString() || ""
   });
   readonly forecastRange = computed(() => {
     const w = this.weather();
