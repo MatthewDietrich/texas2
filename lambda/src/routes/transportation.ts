@@ -7,7 +7,7 @@ const METERS_PER_MILE = 1609.34;
 const AIRPORT_RADIUS_MILES = 50;
 const HIGHWAY_RADIUS_MILES = 25;
 const MAX_AIRPORTS = 5;
-const MAX_HIGHWAYS = 8;
+const MAX_HIGHWAYS = 5;
 
 /** GET /cities/:name/transportation — nearby airports and highways */
 export const getTransportationForCity: RouteHandler = async ({
