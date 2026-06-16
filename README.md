@@ -1,73 +1,18 @@
-# React + TypeScript + Vite
+# Texas City Snapshot 2.0
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An app that aggregates current weather reports, TxDOT highway camera snapshots, and reservoir fullness data for cities and towns across Texas.
 
-Currently, two official plugins are available:
+Hosted at https://texas.lizard.fun
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live information sources
+- Road camera snapshots: [Texas Department of Transportation](https://www.txdot.gov/discover/live-traffic-cameras.html)
+- Weather reports and history: [Open-Meteo](https://open-meteo.com/)
+- Weather alerts: [National Weather Service](https://www.weather.gov/alerts)
+- Reservoir fullness: [Water Data For Texas](https://www.waterdatafortexas.org/)
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+## Static datasets used from the following sources
+- [Texas Cities Polygon (City of Denton Open Data)](https://data.cityofdenton.com/dataset/texas-cities-polygon)
+- [Texas Counties Polygon (City of Denton Open Data)](https://data.cityofdenton.com/dataset/texas-counties-polygon)
+- [TxDOT Districts Polygon (Texas Department of Transportation Open Data)](https://gis-txdot.opendata.arcgis.com/datasets/TXDOT::txdot-districts/about)
+- [Texas Airports (Texas Department of Transportation Open Data)](https://gis-txdot.opendata.arcgis.com/datasets/texas-airports/about)
+- [National Highway System in Texas (Texas Department of Transportation Open Data)](https://gis-txdot.opendata.arcgis.com/datasets/TXDOT::txdot-national-highway-system/about)
