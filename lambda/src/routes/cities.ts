@@ -180,10 +180,20 @@ export const recordSearch: RouteHandler = async ({ params, origin }) => {
   const db = await getDb();
   const result = await db.collection(Collections.city).findOneAndUpdate(
     { "properties.name": params.name },
-    {
-      $inc: { timesSearched: 1 },
-      $set: { lastSearched: new Date() },
-    },
+    [
+      {
+        $set: {
+          timesSearched: {
+            $cond: [
+              { $eq: ["$timesSearched", null] },
+              1,
+              { $add: ["$timesSearched", 1] },
+            ],
+          },
+          lastSearched: new Date(),
+        },
+      },
+    ],
     {
       returnDocument: "after",
       projection: { "properties.name": 1, timesSearched: 1, _id: 0 },
