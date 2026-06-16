@@ -1,4 +1,12 @@
-import { Component, inject, input } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  inject,
+  input,
+  signal,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { Location } from "@angular/common";
 import { ThemeService, type Theme } from "../../services/theme.service";
@@ -13,6 +21,9 @@ export class NavBarComponent {
   readonly variant = input<"home" | "page">("page");
   readonly themeService = inject(ThemeService);
   private location = inject(Location);
+  private elementRef = inject(ElementRef);
+
+  readonly themeMenuOpen = signal(false);
 
   readonly themes: { value: Theme; label: string; cls: string }[] = [
     { value: "green", label: "Green", cls: "sw-green" },
@@ -21,7 +32,30 @@ export class NavBarComponent {
     { value: "purple", label: "Purple", cls: "sw-purple" },
   ];
 
+  readonly activeTheme = computed(
+    () =>
+      this.themes.find((t) => t.value === this.themeService.theme()) ??
+      this.themes[0],
+  );
+
+  toggleThemeMenu(): void {
+    this.themeMenuOpen.update((open) => !open);
+  }
+
+  selectTheme(value: Theme): void {
+    this.themeService.setTheme(value);
+    this.themeMenuOpen.set(false);
+  }
+
   goBack(): void {
     this.location.back();
+  }
+
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.themeMenuOpen()) return;
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.themeMenuOpen.set(false);
+    }
   }
 }

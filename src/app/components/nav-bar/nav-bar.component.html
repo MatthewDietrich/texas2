@@ -20,14 +20,30 @@
       <a class="icon-btn" routerLink="/mostsearched" aria-label="Leaderboard">
         <svg class="ic"><use href="#i-trophy"></use></svg>
       </a>
-      <div class="swatches" role="group" aria-label="Color theme">
-        @for (t of themes; track t.value) {
-          <button
-            class="swatch {{ t.cls }}"
-            [attr.aria-pressed]="themeService.theme() === t.value"
-            [attr.aria-label]="t.label"
-            (click)="themeService.setTheme(t.value)"
-          ></button>
+      <div class="theme-menu">
+        <button
+          class="icon-btn"
+          aria-haspopup="true"
+          [attr.aria-expanded]="themeMenuOpen()"
+          aria-label="Color theme"
+          (click)="toggleThemeMenu()"
+        >
+          <span class="swatch-dot {{ activeTheme().cls }}"></span>
+        </button>
+        @if (themeMenuOpen()) {
+          <div class="theme-dropdown" role="menu">
+            @for (t of themes; track t.value) {
+              <button
+                class="theme-option"
+                role="menuitemradio"
+                [attr.aria-checked]="themeService.theme() === t.value"
+                (click)="selectTheme(t.value)"
+              >
+                <span class="swatch-dot {{ t.cls }}"></span>
+                <span>{{ t.label }}</span>
+              </button>
+            }
+          </div>
         }
       </div>
       <span class="nav-divider"></span>
