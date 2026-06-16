@@ -33,7 +33,7 @@ export interface CityDoc extends WithId<Document> {
   nearby: string[];
 }
 
-export interface CameraDoc {
+export interface CameraDoc extends WithId<Document> {
   icdId: string;
   direction: string;
   location: {
@@ -46,7 +46,7 @@ export interface CameraDoc {
   lastViewed: string | null;
 }
 
-export interface AirportDoc {
+export interface AirportDoc extends WithId<Document> {
   type: "Feature";
   id: number;
   geometry: {
@@ -59,7 +59,7 @@ export interface AirportDoc {
   };
 }
 
-export interface HighwayDoc {
+export interface HighwayDoc extends WithId<Document> {
   type: "Feature";
   id: number;
   geometry: {

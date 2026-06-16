@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 lambda/dist
-.angular/cache
+.angular/cache/*

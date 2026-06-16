@@ -7,8 +7,7 @@
         @if (city(); as c) {
           <div class="eyebrow mb2">{{ c.county }} County, Texas</div>
           <h1 class="h-display">{{ c.properties.name }}</h1>
-        }
-        @else {
+        } @else {
           <h1 class="h-display">{{ cityName() }}</h1>
         }
         @if (cityLoading()) {
@@ -333,7 +332,7 @@
                     <div>
                       <span class="res-name">{{ r.name }}</span>
                       @if (r.nearestCity) {
-                        <span class="res-near">near {{ r.nearestCity }}</span>
+                        <span class="res-near"> near {{ r.nearestCity }}</span>
                       }
                     </div>
                     <span class="res-pct">
@@ -370,7 +369,48 @@
 
       <!-- TRANSPORTATION -->
       <section class="tabpanel" [class.active]="activeTab() === 'trans'">
-        <p class="muted"><em>Transportation data coming soon.</em></p>
+        @if (transLoading()) {
+          <p class="muted mt4">Loading transportation data…</p>
+        } @else if (transError()) {
+          <p style="color: var(--accent)">{{ transError() }}</p>
+        } @else {
+          <div class="wx-2col">
+            <div>
+              <h3 class="card-title mb4">Nearest airports</h3>
+              <div class="card card-pad">
+                @if (transportation()?.airports?.length) {
+                  <div class="dlist">
+                    @for (a of transportation()!.airports; track a.name) {
+                      <div class="drow">
+                        <span class="dname">{{ a.name }}</span>
+                        <span class="ddist">{{ a.distanceMiles }} mi</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="muted"><em>No nearby airports found.</em></p>
+                }
+              </div>
+            </div>
+            <div>
+              <h3 class="card-title mb4">Nearest highways</h3>
+              <div class="card card-pad">
+                @if (transportation()?.highways?.length) {
+                  <div class="dlist">
+                    @for (h of transportation()!.highways; track h.name) {
+                      <div class="drow">
+                        <span class="dname">{{ h.name }}</span>
+                        <span class="ddist">{{ h.distanceMiles }} mi</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="muted"><em>No nearby highways found.</em></p>
+                }
+              </div>
+            </div>
+          </div>
+        }
       </section>
     </div>
   </main>

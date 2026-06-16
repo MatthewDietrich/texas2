@@ -5,9 +5,11 @@ import { FooterComponent } from "../../components/footer/footer.component";
 import { getCity, recordSearch } from "../../../api/cities";
 import { getCamerasForCity } from "../../../api/cameras";
 import { getWeather } from "../../../api/weather";
+import { getTransportation } from "../../../api/transportation";
 import type { City } from "../../../api/cities";
 import type { Camera } from "../../../api/cameras";
 import type { Weather, WeatherDay } from "../../../api/weather";
+import type { Transportation } from "../../../api/transportation";
 
 type Tab = "snap" | "weather" | "water" | "trans";
 
@@ -52,6 +54,29 @@ const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
         grid-template-columns: 1fr 1fr;
         gap: var(--s5);
       }
+      .dlist {
+        display: flex;
+        flex-direction: column;
+      }
+      .drow {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--s4);
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .drow:last-child {
+        border-bottom: none;
+      }
+      .dname {
+        font-size: 14px;
+      }
+      .ddist {
+        color: var(--text-muted);
+        font-size: 13px;
+        white-space: nowrap;
+      }
       @media (max-width: 760px) {
         .city-head {
           padding: var(--s6) 0 var(--s5);
@@ -88,6 +113,9 @@ export class CityComponent {
   weather = signal<Weather | null>(null);
   weatherLoading = signal(true);
   weatherError = signal<string | null>(null);
+  transportation = signal<Transportation | null>(null);
+  transLoading = signal(true);
+  transError = signal<string | null>(null);
 
   activeTab = signal<Tab>("snap");
 
@@ -108,11 +136,11 @@ export class CityComponent {
   });
   readonly population = computed(() => {
     const c = this.city();
-    return c?.population?.toLocaleString() || "(no data)"
+    return c?.population?.toLocaleString() || "(no data)";
   });
   readonly timesSearched = computed(() => {
     const c = this.city();
-    return c?.timesSearched?.toLocaleString() || "0"
+    return c?.timesSearched?.toLocaleString() || "0";
   });
   readonly forecastRange = computed(() => {
     const w = this.weather();
@@ -128,6 +156,7 @@ export class CityComponent {
       this.loadCity(name);
       this.loadCameras(name);
       this.loadWeather(name);
+      this.loadTransportation(name);
       recordSearch(name).catch(() => {});
     });
   }
@@ -167,6 +196,20 @@ export class CityComponent {
       );
     } finally {
       this.weatherLoading.set(false);
+    }
+  }
+
+  private async loadTransportation(name: string): Promise<void> {
+    this.transLoading.set(true);
+    this.transError.set(null);
+    try {
+      this.transportation.set(await getTransportation(name));
+    } catch (err) {
+      this.transError.set(
+        err instanceof Error ? err.message : "Request failed",
+      );
+    } finally {
+      this.transLoading.set(false);
     }
   }
 
