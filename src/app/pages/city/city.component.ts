@@ -106,6 +106,14 @@ export class CityComponent {
     const c = this.city();
     return c ? Math.abs(parseFloat(c.properties.intptlon)).toFixed(7) : "";
   });
+  readonly population = computed(() => {
+    const c = this.city();
+    return c ? c.population.toLocaleString() : ""
+  });
+  readonly timesSearched = computed(() => {
+    const c = this.city();
+    return c ? c.timesSearched.toLocaleString() : ""
+  });
   readonly forecastRange = computed(() => {
     const w = this.weather();
     if (!w?.daily.length) return { min: 0, max: 100 };
