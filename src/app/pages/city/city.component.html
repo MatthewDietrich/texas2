@@ -35,6 +35,16 @@
           </div>
         }
       </div>
+      @if (city()) {
+        <div class="city-map" aria-hidden="true">
+          <img [src]="themeService.mapSrc()" alt="" />
+          <span
+            class="city-dot"
+            [style.left.%]="mapPos().left"
+            [style.top.%]="mapPos().top"
+          ></span>
+        </div>
+      }
     </section>
 
     <div class="tabbar">
