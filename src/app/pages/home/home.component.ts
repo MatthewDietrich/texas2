@@ -100,6 +100,7 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
         border-color: var(--accent);
         box-shadow: var(--shadow-lg);
         transform: translate(-50%, -54%);
+        z-index: 1;
       }
       .map-tags .tag .pindot {
         width: 8px;
