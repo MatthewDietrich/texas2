@@ -1,4 +1,11 @@
-import { Component, inject, input, signal, effect, computed } from "@angular/core";
+import {
+  Component,
+  inject,
+  input,
+  signal,
+  effect,
+  computed,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
 import { FooterComponent } from "../../components/footer/footer.component";
@@ -106,9 +113,6 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
       @media (max-width: 760px) {
         .city-head {
           padding: var(--s6) 0 var(--s5);
-        }
-        .city-map {
-          display: none;
         }
         .statrow {
           gap: var(--s5);
