@@ -62,15 +62,10 @@
                       city.name
                     }}</a>
                   </td>
-                  <td class="lb-hide">
-                    <div class="bar-cell">
-                      <span class="mono" style="font-size: 14px">{{
-                        city.count.toLocaleString()
-                      }}</span>
-                      <div class="mini">
-                        <span [style.width.%]="barWidth(city.count)"></span>
-                      </div>
-                    </div>
+                  <td class="lb-hide num">
+                    <span class="mono" style="font-size: 14px">{{
+                      city.count.toLocaleString()
+                    }}</span>
                   </td>
                 </tr>
               }

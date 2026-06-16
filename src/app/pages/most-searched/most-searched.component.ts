@@ -71,10 +71,6 @@ export class MostSearchedComponent implements OnInit {
     });
   });
 
-  readonly maxCount = computed(() =>
-    Math.max(...(this.cities() ?? []).map((c) => c.timesSearched), 1),
-  );
-
   ngOnInit(): void {
     getTopSearched(100)
       .then((c) => {
@@ -109,8 +105,5 @@ export class MostSearchedComponent implements OnInit {
   }
   rankLabel(rank: number): string {
     return String(rank).padStart(2, "0");
-  }
-  barWidth(count: number): number {
-    return Math.round((count / this.maxCount()) * 100);
   }
 }

@@ -1008,26 +1008,6 @@ ol {
 .dtable .cname:hover {
   color: var(--accent);
 }
-.bar-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  justify-content: flex-end;
-}
-.bar-cell .mini {
-  width: 90px;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-.bar-cell .mini > span {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
-}
-
 /* Footer */
 .foot {
   margin-top: auto;
