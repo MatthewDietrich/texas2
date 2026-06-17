@@ -45,13 +45,16 @@ class TexasCityApiStack extends Stack {
     new CfnOutput(this, "ApiUrl", {
       value: fnUrl.url,
       description: "Texas City Snapshot API URL — set this as VITE_API_URL",
-      exportName: "TexasCityApiUrl",
+      exportName: `TexasCityApiUrl-${branch}`,
     });
   }
 }
 
+const branch = process.env.AMPLIFY_BRANCH ?? "main";
+const stackName = branch === "main" ? "TexasCityApiStack" : `TexasCityApiStack-${branch}`;
+
 const app = new App();
-new TexasCityApiStack(app, "TexasCityApiStack", {
+new TexasCityApiStack(app, stackName, {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION ?? "us-east-1",
