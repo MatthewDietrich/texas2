@@ -107,6 +107,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
     ),
   );
 
+  const TWENTY_FOUR_HOURS = 86400;
   return ok(
     {
       ...city,
@@ -119,6 +120,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
       })),
     },
     origin,
+    TWENTY_FOUR_HOURS,
   );
 };
 

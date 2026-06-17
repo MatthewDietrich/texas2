@@ -5,8 +5,16 @@ import type { APIGatewayProxyResultV2 } from "aws-lambda";
 // browsers reject. Only Content-Type belongs in the Lambda response.
 const HEADERS = { "Content-Type": "application/json" };
 
-export function ok(body: unknown, _origin?: string): APIGatewayProxyResultV2 {
-  return { statusCode: 200, headers: HEADERS, body: JSON.stringify(body) };
+export function ok(
+  body: unknown,
+  _origin?: string,
+  ttlSeconds?: number,
+): APIGatewayProxyResultV2 {
+  const headers: Record<string, string> = { ...HEADERS };
+  if (ttlSeconds != null) {
+    headers["Cache-Control"] = `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`;
+  }
+  return { statusCode: 200, headers, body: JSON.stringify(body) };
 }
 
 export function notFound(

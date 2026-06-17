@@ -139,6 +139,7 @@ export const getWeather: RouteHandler = async ({ params, origin }) => {
     };
   }
 
+  const FIVE_MINUTES = 300;
   return ok(
     {
       current: {
@@ -164,5 +165,6 @@ export const getWeather: RouteHandler = async ({ params, origin }) => {
       alerts,
     },
     origin,
+    FIVE_MINUTES,
   );
 };
