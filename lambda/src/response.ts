@@ -12,7 +12,8 @@ export function ok(
 ): APIGatewayProxyResultV2 {
   const headers: Record<string, string> = { ...HEADERS };
   if (ttlSeconds != null) {
-    headers["Cache-Control"] = `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`;
+    headers["Cache-Control"] =
+      `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`;
   }
   return { statusCode: 200, headers, body: JSON.stringify(body) };
 }
