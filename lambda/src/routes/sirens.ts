@@ -1,8 +1,8 @@
 import { kml as kmlToGeoJson } from '@tmcw/togeojson';
 import { DOMParser } from 'xmldom';
 import type { FeatureCollection } from 'geojson';
-import { getClient, getDb } from "./db";
-import { Collections } from "./collections";
+import { getClient, getDb } from "../db";
+import { Collections } from "../collections";
 
 const SIRENS_URL = "https://www.google.com/maps/d/kml?mid=1fRAxrc0b1Wng0PRe3d9x9mzQD6s&forcekml=1";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
