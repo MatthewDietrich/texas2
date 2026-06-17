@@ -43,10 +43,9 @@ import { FooterComponent } from "../../components/footer/footer.component";
         font-size: 13px;
         margin-bottom: var(--s1);
       }
-      .faq-ans a {
+      .about-wrap a {
         color: var(--accent);
-        text-decoration: underline;
-        text-underline-offset: 2px;
+        text-decoration: none;
       }
     `,
   ],
