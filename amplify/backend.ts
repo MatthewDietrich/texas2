@@ -23,10 +23,11 @@ class TexasCityApiStack extends Stack {
       },
     });
 
-    // Allowed origins: Amplify production URL + localhost for dev.
-    // Set AMPLIFY_APP_URL in the Amplify Console environment variables.
+    // Allowed origins: Amplify production URL + custom domain + localhost for dev.
+    // Set AMPLIFY_APP_URL and CUSTOM_DOMAIN_URL in the Amplify Console environment variables.
     const allowedOrigins = [
       process.env.AMPLIFY_APP_URL ?? "",
+      process.env.CUSTOM_DOMAIN_URL ?? "",
       "http://localhost:4200",
     ].filter(Boolean);
 
