@@ -12,9 +12,7 @@ export class ThemeService {
     (localStorage.getItem("mode") as Mode) ?? "light",
   );
 
-  readonly mapSrc = computed(
-    () => `assets/maps/texas-${this.theme()}-${this.mode()}.png`,
-  );
+  readonly mapSrc = computed(() => `assets/texas.png`);
 
   constructor() {
     effect(() => {
