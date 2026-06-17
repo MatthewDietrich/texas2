@@ -28,6 +28,21 @@ import { FooterComponent } from "../../components/footer/footer.component";
         font-size: 14px;
         color: var(--text-muted);
       }
+      .dataset-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+      }
+      .dataset-list h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 var(--s2);
+      }
+      .dataset-list a {
+        display: block;
+        font-size: 13px;
+        margin-bottom: var(--s1);
+      }
       .faq-ans a {
         color: var(--accent);
         text-decoration: underline;
