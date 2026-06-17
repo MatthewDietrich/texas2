@@ -123,7 +123,10 @@
                       [alt]="cam.icdId"
                     />
                   } @else {
-                    <img src="/unavailable.png" alt="Snapshot unavailable" />
+                    <div class="cam-unavailable">
+                      <svg class="ic"><use href="#i-camera-off"></use></svg>
+                      <span>Camera image unavailable</span>
+                    </div>
                   }
                 </div>
                 <div class="cam-meta">
