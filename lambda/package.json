@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "mongodb": "^6.0.0"
+    "mongodb": "^6.0.0",
+    "@tmcw/togeojson": "^7.1.2"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.0",
