@@ -1,7 +1,7 @@
 import { kml as kmlToGeoJson } from '@tmcw/togeojson';
 import { DOMParser } from 'xmldom';
 import type { FeatureCollection } from 'geojson';
-import { getDb } from "./db";
+import { getClient, getDb } from "./db";
 import { Collections } from "./collections";
 
 const SIRENS_URL = "https://www.google.com/maps/d/kml?mid=1fRAxrc0b1Wng0PRe3d9x9mzQD6s&forcekml=1";
@@ -32,8 +32,18 @@ export async function updateSirens(): Promise<{ inserted: number } | { skipped: 
     const fetchedAt = new Date().toISOString();
     const docs = features.map((f) => ({ ...f, _fetchedAt: fetchedAt }));
 
-    await db.collection(Collections.siren).deleteMany({});
-    const result = await db.collection(Collections.siren).insertMany(docs, { ordered: false });
+    const mongoClient = await getClient();
+    const session = mongoClient.startSession();
+    let insertedCount = 0;
+    try {
+        await session.withTransaction(async () => {
+            await db.collection(Collections.siren).deleteMany({}, { session });
+            const result = await db.collection(Collections.siren).insertMany(docs, { session, ordered: false });
+            insertedCount = result.insertedCount;
+        });
+    } finally {
+        await session.endSession();
+    }
 
-    return { inserted: result.insertedCount };
+    return { inserted: insertedCount };
 }
