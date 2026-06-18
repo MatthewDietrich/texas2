@@ -139,8 +139,9 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
       })),
       sirens: sirenDocs.map((d: any, i: number) => ({
         name: d.properties.name,
-        lat: d.geometry[1],
-        lon: d.geometry[0],
+        description: d.properties.description,
+        lat: d.geometry.coordinates[1],
+        lon: d.geometry.coordinates[0],
       })),
     },
     origin,
