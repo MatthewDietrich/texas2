@@ -72,10 +72,10 @@
         </button>
         <button
           class="segtab"
-          [attr.aria-selected]="activeTab() === 'trans'"
-          (click)="activeTab.set('trans')"
+          [attr.aria-selected]="activeTab() === 'infra'"
+          (click)="activeTab.set('infra')"
         >
-          <svg class="ic"><use href="#i-car"></use></svg> Transportation
+          <svg class="ic"><use href="#i-car"></use></svg> Infrastructure
         </button>
       </div>
       @if (weather()?.alerts?.length) {
@@ -381,7 +381,7 @@
       </section>
 
       <!-- TRANSPORTATION -->
-      <section class="tabpanel" [class.active]="activeTab() === 'trans'">
+      <section class="tabpanel" [class.active]="activeTab() === 'infra'">
         @if (transLoading()) {
           <p class="muted mt4">Loading transportation data…</p>
         } @else if (transError()) {
@@ -423,6 +423,34 @@
               </div>
             </div>
           </div>
+          @if (city()?.sirens?.length) {
+            <div class="mt5">
+              <h3 class="card-title mb4">Outdoor warning sirens</h3>
+              <div class="card card-pad">
+                <div class="dlist">
+                  @for (s of city()!.sirens!; track s.name) {
+                    <div class="drow">
+                      <div>
+                        <span class="dname">{{ s.name }}</span>
+                        @if (s.description) {
+                          <p
+                            class="muted"
+                            style="font-size: 0.85em; margin: 0.15em 0 0"
+                          >
+                            {{ s.description }}
+                          </p>
+                        }
+                      </div>
+                      <span class="ddist" style="white-space: nowrap"
+                        >{{ s.lat | number: "1.4-4" }},
+                        {{ s.lon | number: "1.4-4" }}</span
+                      >
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
         }
       </section>
     </div>

@@ -6,6 +6,7 @@ import {
   effect,
   computed,
 } from "@angular/core";
+import { DecimalPipe } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
 import { FooterComponent } from "../../components/footer/footer.component";
@@ -19,7 +20,7 @@ import type { Camera } from "../../../api/cameras";
 import type { Weather, WeatherDay } from "../../../api/weather";
 import type { Transportation } from "../../../api/transportation";
 
-type Tab = "snap" | "weather" | "water" | "trans";
+type Tab = "snap" | "weather" | "water" | "infra";
 
 const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
 
@@ -29,7 +30,7 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
 @Component({
   selector: "app-city",
   standalone: true,
-  imports: [RouterLink, NavBarComponent, FooterComponent],
+  imports: [RouterLink, NavBarComponent, FooterComponent, DecimalPipe],
   templateUrl: "./city.component.html",
   styles: [
     `

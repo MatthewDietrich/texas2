@@ -137,6 +137,11 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         percentFull: d.percentFull ?? null,
         nearestCity: (reservoirCities[i] as any)?.properties?.name ?? null,
       })),
+      sirens: sirenDocs.map((d: any, i: number) => ({
+        name: d.properties.name,
+        lat: d.geometry[1],
+        lon: d.geometry[0],
+      })),
     },
     origin,
     TWENTY_FOUR_HOURS,
