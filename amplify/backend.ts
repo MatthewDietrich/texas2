@@ -1,6 +1,8 @@
 import { App, Stack, Duration, CfnOutput } from "aws-cdk-lib";
 import type { StackProps } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as events from "aws-cdk-lib/aws-events";
+import * as targets from "aws-cdk-lib/aws-events-targets";
 import { Construct } from "constructs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -41,6 +43,11 @@ class TexasCityApiStack extends Stack {
         allowedHeaders: ["Content-Type"],
         maxAge: Duration.days(1),
       },
+    });
+
+    new events.Rule(this, "DailyRefreshRule", {
+      schedule: events.Schedule.rate(Duration.days(1)),
+      targets: [new targets.LambdaFunction(apiHandler)],
     });
 
     new CfnOutput(this, "ApiUrl", {

@@ -115,11 +115,20 @@ const ROUTES: Route[] = [
 
 // ── Handler ──────────────────────────────────────────────────────────────────
 
+const SCHEDULED_CTX: RouteContext = { params: {}, query: {}, body: null, origin: "" };
+
 export const handler = async (
-  event: APIGatewayProxyEventV2,
-): Promise<APIGatewayProxyResultV2> => {
-  const method = event.requestContext.http.method.toUpperCase();
-  const path = event.rawPath.replace(/^\/api/, ""); // strip /api prefix if API Gateway adds one
+  event: APIGatewayProxyEventV2 | { source: string },
+): Promise<APIGatewayProxyResultV2 | void> => {
+  if ("source" in event && event.source === "aws.events") {
+    console.log("[scheduler] running daily refresh");
+    await Promise.all([refreshReservoirs(SCHEDULED_CTX), updateSirens(SCHEDULED_CTX)]);
+    return;
+  }
+
+  const httpEvent = event as APIGatewayProxyEventV2;
+  const method = httpEvent.requestContext.http.method.toUpperCase();
+  const path = httpEvent.rawPath.replace(/^\/api/, ""); // strip /api prefix if API Gateway adds one
 
   // OPTIONS preflight is handled by the Lambda Function URL — it never reaches here
 
@@ -136,8 +145,8 @@ export const handler = async (
 
     const ctx: RouteContext = {
       params,
-      query: (event.queryStringParameters ?? {}) as Record<string, string>,
-      body: parseBody(event),
+      query: (httpEvent.queryStringParameters ?? {}) as Record<string, string>,
+      body: parseBody(httpEvent),
       origin: "",
     };
 
@@ -167,7 +176,7 @@ export const handler = async (
 function parseBody(event: APIGatewayProxyEventV2): unknown {
   if (!event.body) return null;
   const raw = event.isBase64Encoded
-    ? Buffer.from(event.body, "base64").toString("utf8")
+    ? Buffer.from(event.body, "base64").toString("utf-8")
     : event.body;
   try {
     return JSON.parse(raw);
