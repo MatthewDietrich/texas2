@@ -115,14 +115,22 @@ const ROUTES: Route[] = [
 
 // ── Handler ──────────────────────────────────────────────────────────────────
 
-const SCHEDULED_CTX: RouteContext = { params: {}, query: {}, body: null, origin: "" };
+const SCHEDULED_CTX: RouteContext = {
+  params: {},
+  query: {},
+  body: null,
+  origin: "",
+};
 
 export const handler = async (
   event: APIGatewayProxyEventV2 | { source: string },
 ): Promise<APIGatewayProxyResultV2 | void> => {
   if ("source" in event && event.source === "aws.events") {
     console.log("[scheduler] running daily refresh");
-    await Promise.all([refreshReservoirs(SCHEDULED_CTX), updateSirens(SCHEDULED_CTX)]);
+    await Promise.all([
+      refreshReservoirs(SCHEDULED_CTX),
+      updateSirens(SCHEDULED_CTX),
+    ]);
     return;
   }
 

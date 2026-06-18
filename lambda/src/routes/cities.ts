@@ -137,15 +137,12 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         percentFull: d.percentFull ?? null,
         nearestCity: (reservoirCities[i] as any)?.properties?.name ?? null,
       })),
-      sirens: (() => {
-        if (sirenDocs.length) console.log("[sirens] sample doc:", JSON.stringify(sirenDocs[0]));
-        return sirenDocs.map((d: any) => ({
-          name: d.properties?.name ?? null,
-          description: d.properties?.description ?? null,
-          lat: d.geometry?.coordinates?.[1] ?? null,
-          lon: d.geometry?.coordinates?.[0] ?? null,
-        }));
-      })(),
+      sirens: sirenDocs.map((d: any) => ({
+        name: d.properties?.name ?? null,
+        description: d.properties?.description ?? null,
+        lat: d.geometry?.coordinates?.[1] ?? null,
+        lon: d.geometry?.coordinates?.[0] ?? null,
+      })),
     },
     origin,
     TWENTY_FOUR_HOURS,
