@@ -3,16 +3,14 @@ import { getDb } from "../db";
 import { ok, notFound, badRequest } from "../response";
 import { getCctvSnapshot } from "../txdot";
 import { Collections } from "../collections";
+import { getCityCoords } from "../cityCoords";
 
 const SNAPSHOT_TTL_MS = 5 * 60 * 1000;
 
-function isCacheFresh(cam: {
-  snapshot?: string | null;
-  snapshotCachedAt?: string | null;
-}): boolean {
+function isCacheFresh(cam: Record<string, unknown>): boolean {
   return (
-    !!cam.snapshot &&
-    !!cam.snapshotCachedAt &&
+    typeof cam.snapshot === "string" &&
+    typeof cam.snapshotCachedAt === "string" &&
     Date.now() - new Date(cam.snapshotCachedAt).getTime() < SNAPSHOT_TTL_MS
   );
 }
@@ -54,24 +52,12 @@ export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   const NUM_CAMERAS = 8;
   if (!params.name) return badRequest("City name is required", origin);
 
-  const db = await getDb();
-  const city = await db.collection(Collections.city).findOne(
-    { "properties.name": params.name },
-    {
-      projection: {
-        "properties.intptlat": 1,
-        "properties.intptlon": 1,
-        _id: 0,
-      },
-      collation: { locale: "en", strength: 2 },
-    },
-  );
-  if (!city)
+  const coords = await getCityCoords(params.name);
+  if (!coords)
     return notFound(`No city found with name "${params.name}"`, origin);
 
-  const lat = parseFloat(city.properties.intptlat);
-  const lon = parseFloat(city.properties.intptlon);
-
+  const { lat, lon } = coords;
+  const db = await getDb();
   const cameras = await db
     .collection(Collections.camera)
     .aggregate([

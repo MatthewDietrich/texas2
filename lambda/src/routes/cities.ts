@@ -19,6 +19,8 @@ export const listCities: RouteHandler = async ({ origin }) => {
 
 /** GET /cities/:name — full city document */
 export const getCity: RouteHandler = async ({ params, origin }) => {
+  const DISTANCE_METERS = 16093;
+  const NUM_SIRENS = 20;
   const db = await getDb();
   const city = await db
     .collection(Collections.city)
@@ -32,7 +34,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat);
   const lon = parseFloat(city.properties.intptlon);
 
-  const [nearbyDocs, countyDocs, reservoirDocs] = await Promise.all([
+  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs] = await Promise.all([
     db
       .collection(Collections.city)
       .aggregate([
@@ -83,6 +85,23 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
             _id: 0,
           },
         },
+      ])
+      .toArray(),
+    db
+      .collection(Collections.siren)
+      .aggregate([
+        {
+          $geoNear: {
+            near: { type: "Point", coordinates: [lon, lat] },
+            key: "geometry",
+            distanceField: "dist",
+            maxDistance: DISTANCE_METERS,
+            spherical: true,
+          },
+        },
+        { $limit: NUM_SIRENS },
+        { $sort: { dist: 1 } },
+        { $project: { _id: 0, _fetchedAt: 0 } },
       ])
       .toArray(),
   ]);

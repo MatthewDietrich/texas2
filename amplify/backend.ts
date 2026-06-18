@@ -52,7 +52,8 @@ class TexasCityApiStack extends Stack {
 }
 
 const branch = process.env.AMPLIFY_BRANCH ?? "main";
-const stackName = branch === "main" ? "TexasCityApiStack" : `TexasCityApiStack-${branch}`;
+const stackName =
+  branch === "main" ? "TexasCityApiStack" : `TexasCityApiStack-${branch}`;
 
 const app = new App();
 new TexasCityApiStack(app, stackName, {

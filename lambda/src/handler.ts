@@ -19,6 +19,7 @@ import { getWeather } from "./routes/weather";
 import { getTransportationForCity } from "./routes/transportation";
 import { refreshDistrict } from "./routes/districts";
 import { refreshReservoirs } from "./routes/reservoirs";
+import { updateSirens } from "./routes/sirens";
 
 // ── Route table ──────────────────────────────────────────────────────────────
 // Pattern groups become named params (keys array must match group order).
@@ -102,6 +103,13 @@ const ROUTES: Route[] = [
     pattern: /^\/reservoirs\/refresh$/,
     keys: [],
     handler: refreshReservoirs,
+  },
+  // Sirens — writes
+  {
+    method: "POST",
+    pattern: /^\/sirens\/refresh$/,
+    keys: [],
+    handler: updateSirens,
   },
 ];
 

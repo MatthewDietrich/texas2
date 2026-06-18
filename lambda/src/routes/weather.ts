@@ -1,7 +1,6 @@
 import type { RouteHandler } from "../types";
-import { getDb } from "../db";
 import { ok, notFound, badRequest } from "../response";
-import { Collections } from "../collections";
+import { getCityCoords } from "../cityCoords";
 import {
   getForecastByCoordinates,
   getHistoryByCoordinates,
@@ -46,23 +45,11 @@ function shiftYears(date: Date, years: number): Date {
 export const getWeather: RouteHandler = async ({ params, origin }) => {
   if (!params.name) return badRequest("City name is required", origin);
 
-  const db = await getDb();
-  const city = await db.collection(Collections.city).findOne(
-    { "properties.name": params.name },
-    {
-      projection: {
-        "properties.intptlat": 1,
-        "properties.intptlon": 1,
-        _id: 0,
-      },
-      collation: { locale: "en", strength: 2 },
-    },
-  );
-  if (!city)
+  const coords = await getCityCoords(params.name);
+  if (!coords)
     return notFound(`No city found with name "${params.name}"`, origin);
 
-  const lat = parseFloat(city.properties.intptlat);
-  const lon = parseFloat(city.properties.intptlon);
+  const { lat, lon } = coords;
   const now = new Date();
 
   const [forecast, hist1, hist5, hist10, alertsResult] = await Promise.all([

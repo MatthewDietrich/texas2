@@ -58,8 +58,8 @@ export async function getForecastByCoordinates(
 ): Promise<OpenMeteoForecast> {
   const url = FORECAST_BASE;
   const params = {
-    latitude: latitude,
-    longitude: longitude,
+    latitude: latitude.toFixed(7),
+    longitude: longitude.toFixed(7),
     current:
       "temperature_2m,relative_humidity_2m,apparent_temperature,dew_point_2m,precipitation_probability,rain,wind_speed_10m,wind_direction_10m,weather_code,cloud_cover,is_day,pressure_msl",
     daily:
@@ -69,7 +69,7 @@ export async function getForecastByCoordinates(
     temperature_unit: "fahrenheit",
     wind_speed_unit: "mph",
     timezone: "America/Chicago",
-    past_days: 1,
+    past_days: "1",
   };
   const queryString = new URLSearchParams(params).toString();
   const res = await fetch(`${url}?${queryString}`);
@@ -89,8 +89,8 @@ export async function getHistoryByCoordinates(
 ): Promise<OpenMeteoHistory> {
   const url = HISTORICAL_BASE;
   const params = {
-    latitude: latitude,
-    longitude: longitude,
+    latitude: latitude.toFixed(7),
+    longitude: longitude.toFixed(7),
     start_date: startDate,
     end_date: endDate,
     daily:

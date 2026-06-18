@@ -2,6 +2,7 @@ import type { RouteHandler } from "../types";
 import { getDb } from "../db";
 import { ok, notFound, badRequest } from "../response";
 import { Collections } from "../collections";
+import { getCityCoords } from "../cityCoords";
 
 const METERS_PER_MILE = 1609.34;
 const AIRPORT_RADIUS_MILES = 50;
@@ -16,23 +17,12 @@ export const getTransportationForCity: RouteHandler = async ({
 }) => {
   if (!params.name) return badRequest("City name is required", origin);
 
-  const db = await getDb();
-  const city = await db.collection(Collections.city).findOne(
-    { "properties.name": params.name },
-    {
-      projection: {
-        "properties.intptlat": 1,
-        "properties.intptlon": 1,
-        _id: 0,
-      },
-      collation: { locale: "en", strength: 2 },
-    },
-  );
-  if (!city)
+  const coords = await getCityCoords(params.name);
+  if (!coords)
     return notFound(`No city found with name "${params.name}"`, origin);
 
-  const lat = parseFloat(city.properties.intptlat);
-  const lon = parseFloat(city.properties.intptlon);
+  const { lat, lon } = coords;
+  const db = await getDb();
   const near = { type: "Point" as const, coordinates: [lon, lat] };
 
   const [airports, highways] = await Promise.all([
