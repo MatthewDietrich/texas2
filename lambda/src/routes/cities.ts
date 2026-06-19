@@ -137,7 +137,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
       typeof description === "object" &&
       "@text" in (description as object)
     ) {
-      const text = (description as Record<string, unknown>)["text"];
+      const text = (description as Record<string, unknown>)["value"];
       if (typeof text === "string") raw = text;
     }
     if (!raw) return null;
