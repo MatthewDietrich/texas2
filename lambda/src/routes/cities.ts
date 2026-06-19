@@ -128,17 +128,25 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
 
   const TWENTY_FOUR_HOURS = 86400;
 
-  function sanitizeDescription(
-    description: { "@type": "html"; text: string } | string | null,
-  ): string | null {
+  function sanitizeDescription(description: unknown): string | null {
     if (!description) return null;
-    const raw =
-      typeof description === "string" ? description : description.text;
-    const stripped = raw
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    return stripped || null;
+    let raw: string | null = null;
+    if (typeof description === "string") {
+      raw = description;
+    } else if (
+      typeof description === "object" &&
+      "@text" in (description as object)
+    ) {
+      const text = (description as Record<string, unknown>)["@text"];
+      if (typeof text === "string") raw = text;
+    }
+    if (!raw) return null;
+    return (
+      raw
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim() || null
+    );
   }
 
   return ok(
