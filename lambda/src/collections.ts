@@ -6,4 +6,5 @@ export const Collections = {
   district: "district",
   highway: "highway",
   reservoir: "reservoir",
+  siren: "siren",
 } as const;

@@ -19,6 +19,12 @@ export interface City {
     percentFull: number | null;
     nearestCity: string | null;
   }[];
+  sirens?: {
+    name: string;
+    description: string;
+    lat: number;
+    lon: number;
+  }[];
 }
 
 export interface SearchedCity {

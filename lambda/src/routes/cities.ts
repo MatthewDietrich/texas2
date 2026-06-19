@@ -19,6 +19,8 @@ export const listCities: RouteHandler = async ({ origin }) => {
 
 /** GET /cities/:name — full city document */
 export const getCity: RouteHandler = async ({ params, origin }) => {
+  const DISTANCE_METERS = 16093;
+  const NUM_SIRENS = 20;
   const db = await getDb();
   const city = await db
     .collection(Collections.city)
@@ -32,7 +34,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat);
   const lon = parseFloat(city.properties.intptlon);
 
-  const [nearbyDocs, countyDocs, reservoirDocs] = await Promise.all([
+  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs] = await Promise.all([
     db
       .collection(Collections.city)
       .aggregate([
@@ -85,6 +87,23 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         },
       ])
       .toArray(),
+    db
+      .collection(Collections.siren)
+      .aggregate([
+        {
+          $geoNear: {
+            near: { type: "Point", coordinates: [lon, lat] },
+            key: "geometry",
+            distanceField: "dist",
+            maxDistance: DISTANCE_METERS,
+            spherical: true,
+          },
+        },
+        { $limit: NUM_SIRENS },
+        { $sort: { dist: 1 } },
+        { $project: { _id: 0, _fetchedAt: 0 } },
+      ])
+      .toArray(),
   ]);
 
   const reservoirCities = await Promise.all(
@@ -108,6 +127,28 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   );
 
   const TWENTY_FOUR_HOURS = 86400;
+
+  function sanitizeDescription(description: unknown): string | null {
+    if (!description) return null;
+    let raw: string | null = null;
+    if (typeof description === "string") {
+      raw = description;
+    } else if (
+      typeof description === "object" &&
+      "value" in (description as object)
+    ) {
+      const text = (description as Record<string, unknown>)["value"];
+      if (typeof text === "string") raw = text;
+    }
+    if (!raw) return null;
+    return (
+      raw
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim() || null
+    );
+  }
+
   return ok(
     {
       ...city,
@@ -117,6 +158,12 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         name: d.properties.name,
         percentFull: d.percentFull ?? null,
         nearestCity: (reservoirCities[i] as any)?.properties?.name ?? null,
+      })),
+      sirens: sirenDocs.map((d: any) => ({
+        name: d.properties?.name ?? null,
+        description: sanitizeDescription(d.properties?.description),
+        lat: d.geometry?.coordinates?.[1] ?? null,
+        lon: d.geometry?.coordinates?.[0] ?? null,
       })),
     },
     origin,
