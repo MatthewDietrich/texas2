@@ -49,7 +49,7 @@ export const getCamera: RouteHandler = async ({ params, origin }) => {
 /** GET /cities/:name/cameras — cameras within 10 miles of the city's internal point */
 export const getCamerasForCity: RouteHandler = async ({ params, origin }) => {
   const DISTANCE_METERS = 16093;
-  const NUM_CAMERAS = 8;
+  const NUM_CAMERAS = 16;
   if (!params.name) return badRequest("City name is required", origin);
 
   const coords = await getCityCoords(params.name);
