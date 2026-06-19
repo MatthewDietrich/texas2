@@ -34,91 +34,88 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat);
   const lon = parseFloat(city.properties.intptlon);
 
-  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs, loadZoneDoc] = await Promise.all([
-    db
-      .collection(Collections.city)
-      .aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [lon, lat] },
-            distanceField: "dist",
-            spherical: true,
-            key: "geometry",
-            query: { "properties.name": { $ne: city.properties.name } },
-          },
-        },
-        { $limit: 3 },
-        { $project: { "properties.name": 1, _id: 0 } },
-      ])
-      .toArray(),
-    db
-      .collection(Collections.county)
-      .aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [lon, lat] },
-            distanceField: "dist",
-            spherical: true,
-            key: "geometry",
-          },
-        },
-        { $limit: 1 },
-        { $project: { "properties.name": 1, _id: 0 } },
-      ])
-      .toArray(),
-    db
-      .collection(Collections.reservoir)
-      .aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [lon, lat] },
-            distanceField: "dist",
-            spherical: true,
-          },
-        },
-        { $limit: 5 },
-        {
-          $project: {
-            "properties.name": 1,
-            percentFull: 1,
-            geometry: 1,
-            _id: 0,
-          },
-        },
-      ])
-      .toArray(),
-    db
-      .collection(Collections.siren)
-      .aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [lon, lat] },
-            key: "geometry",
-            distanceField: "dist",
-            maxDistance: DISTANCE_METERS,
-            spherical: true,
-          },
-        },
-        { $limit: NUM_SIRENS },
-        { $sort: { dist: 1 } },
-        { $project: { _id: 0, _fetchedAt: 0 } },
-      ])
-      .toArray(),
+  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs, loadZoneDoc] =
+    await Promise.all([
       db
-        .collection(Collections.ercotLoadZone)
-        .findOne(
+        .collection(Collections.city)
+        .aggregate([
           {
-            geometry: {
-              $geoIntersects: {
-                $geometry: {
-                  type: "Point",
-                  coordinates: [lon, lat],
-                },
-              },
+            $geoNear: {
+              near: { type: "Point", coordinates: [lon, lat] },
+              distanceField: "dist",
+              spherical: true,
+              key: "geometry",
+              query: { "properties.name": { $ne: city.properties.name } },
             },
           },
-        ),
-  ]);
+          { $limit: 3 },
+          { $project: { "properties.name": 1, _id: 0 } },
+        ])
+        .toArray(),
+      db
+        .collection(Collections.county)
+        .aggregate([
+          {
+            $geoNear: {
+              near: { type: "Point", coordinates: [lon, lat] },
+              distanceField: "dist",
+              spherical: true,
+              key: "geometry",
+            },
+          },
+          { $limit: 1 },
+          { $project: { "properties.name": 1, _id: 0 } },
+        ])
+        .toArray(),
+      db
+        .collection(Collections.reservoir)
+        .aggregate([
+          {
+            $geoNear: {
+              near: { type: "Point", coordinates: [lon, lat] },
+              distanceField: "dist",
+              spherical: true,
+            },
+          },
+          { $limit: 5 },
+          {
+            $project: {
+              "properties.name": 1,
+              percentFull: 1,
+              geometry: 1,
+              _id: 0,
+            },
+          },
+        ])
+        .toArray(),
+      db
+        .collection(Collections.siren)
+        .aggregate([
+          {
+            $geoNear: {
+              near: { type: "Point", coordinates: [lon, lat] },
+              key: "geometry",
+              distanceField: "dist",
+              maxDistance: DISTANCE_METERS,
+              spherical: true,
+            },
+          },
+          { $limit: NUM_SIRENS },
+          { $sort: { dist: 1 } },
+          { $project: { _id: 0, _fetchedAt: 0 } },
+        ])
+        .toArray(),
+      db.collection(Collections.ercotLoadZone).findOne({
+        geometry: {
+          $geoIntersects: {
+            $geometry: {
+              type: "Point",
+              coordinates: [lon, lat],
+            },
+          },
+        },
+      }),
+    ]);
 
   const reservoirCities = await Promise.all(
     reservoirDocs.map((r: any) =>
