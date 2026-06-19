@@ -108,8 +108,8 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         .collection(Collections.ercotLoadZone)
         .findOne(
           {
-            "geometry.coordinates": {
-              $geoWithin: {
+            geometry: {
+              $geoIntersects: {
                 $geometry: {
                   type: "Point",
                   coordinates: [lon, lat],
