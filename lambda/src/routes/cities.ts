@@ -127,6 +127,20 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   );
 
   const TWENTY_FOUR_HOURS = 86400;
+
+  function sanitizeDescription(
+    description: { "@type": "html"; text: string } | string | null,
+  ): string | null {
+    if (!description) return null;
+    const raw =
+      typeof description === "string" ? description : description.text;
+    const stripped = raw
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return stripped || null;
+  }
+
   return ok(
     {
       ...city,
@@ -139,7 +153,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
       })),
       sirens: sirenDocs.map((d: any) => ({
         name: d.properties?.name ?? null,
-        description: d.properties?.description ?? null,
+        description: sanitizeDescription(d.properties?.description),
         lat: d.geometry?.coordinates?.[1] ?? null,
         lon: d.geometry?.coordinates?.[0] ?? null,
       })),
