@@ -28,6 +28,12 @@
               <div class="k">Population</div>
               <div class="v mono">{{ population() }}</div>
             </div>
+            @if (c.ercotLoadZone) {
+              <div class="stat">
+                <div class="k">ERCOT Load Zone</div>
+                <div class="v mono">{{ c.ercotLoadZone }}</div>
+              </div>
+            }
             <div class="stat">
               <div class="k">Searched</div>
               <div class="v mono">{{ timesSearched() }}×</div>

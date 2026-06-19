@@ -25,6 +25,7 @@ export interface City {
     lat: number;
     lon: number;
   }[];
+  ercotLoadZone?: string | null;
 }
 
 export interface SearchedCity {

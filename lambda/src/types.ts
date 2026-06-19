@@ -68,3 +68,14 @@ export interface HighwayDoc extends WithId<Document> {
   };
   name: string;
 }
+
+export interface ErcotLoadZoneDoc extends WithId<Document> {
+  type: "Feature";
+  geometry: {
+    type: "MultiPolygon";
+    coordinates: [number, number][][]
+  };
+  properties: {
+    NAME: string
+  }
+}

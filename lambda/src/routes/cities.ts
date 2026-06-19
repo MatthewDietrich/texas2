@@ -34,7 +34,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
   const lat = parseFloat(city.properties.intptlat);
   const lon = parseFloat(city.properties.intptlon);
 
-  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs] = await Promise.all([
+  const [nearbyDocs, countyDocs, reservoirDocs, sirenDocs, loadZoneDoc] = await Promise.all([
     db
       .collection(Collections.city)
       .aggregate([
@@ -104,6 +104,20 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         { $project: { _id: 0, _fetchedAt: 0 } },
       ])
       .toArray(),
+      db
+        .collection(Collections.ercotLoadZone)
+        .findOne(
+          {
+            "geometry.coordinates": {
+              $geoWithin: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [lon, lat],
+                },
+              },
+            },
+          },
+        ),
   ]);
 
   const reservoirCities = await Promise.all(
@@ -165,6 +179,7 @@ export const getCity: RouteHandler = async ({ params, origin }) => {
         lat: d.geometry?.coordinates?.[1] ?? null,
         lon: d.geometry?.coordinates?.[0] ?? null,
       })),
+      ercotLoadZone: (loadZoneDoc as any)?.properties?.NAME ?? null,
     },
     origin,
     TWENTY_FOUR_HOURS,
