@@ -17,7 +17,7 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   // Deduplicate: keep one record per interval start time
   const seen = new Map<string, LoadForecastRecord>();
   for (const r of records) {
-    if (!seen.has(r.intervalstarttime)) seen.set(r.intervalstarttime, r);
+    if (!seen.has(r.interval_start_utc)) seen.set(r.interval_start_utc, r);
   }
 
   const docs = [...seen.values()];
@@ -30,7 +30,7 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const result = await db.collection(Collections.ercotLoadForecast).bulkWrite(
     docs.map((r) => ({
       updateOne: {
-        filter: { intervalstarttime: r.intervalstarttime },
+        filter: { interval_start_utc: r.interval_start_utc },
         update: { $set: { ...r, _fetchedAt: now } },
         upsert: true,
       },

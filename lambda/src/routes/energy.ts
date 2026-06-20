@@ -33,15 +33,15 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
     await db
       .collection(Collections.ercotLoadForecast)
       .find(
-        { intervalstarttime: { $gte: fiveHoursAgo.toISOString() } },
-        { projection: { _id: 0, _fetchedAt: 0 }, sort: { intervalstarttime: -1 } },
+        { _fetchedAt: { $gte: fiveHoursAgo } },
+        { projection: { _id: 0, _fetchedAt: 0 }, sort: { interval_start_utc: -1 } },
       )
       .limit(4)
       .toArray()
   ).reverse();
 
   const loadForecast = forecastDocs.map((r: any) => ({
-    intervalStart: r.intervalstarttime,
+    intervalStart: r.interval_start_utc,
     systemMW: Math.round(r.system_total),
     zoneMW: zoneName != null ? Math.round(r[zoneName] ?? 0) : null,
   }));

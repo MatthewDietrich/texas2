@@ -7,7 +7,7 @@ function getApiKey(): string {
 }
 
 export interface LoadForecastRecord {
-  intervalstarttime: string;
+  interval_start_utc: string;
   north: number;
   south: number;
   west: number;
