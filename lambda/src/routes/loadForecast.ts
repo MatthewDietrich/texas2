@@ -14,16 +14,13 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
     limit: "20", // fetch extra to deduplicate multiple publishes per interval
   });
 
-  // Keep only the most recently published forecast per interval
-  const latest = new Map<string, LoadForecastRecord>();
+  // Deduplicate: keep one record per interval start time
+  const seen = new Map<string, LoadForecastRecord>();
   for (const r of records) {
-    const existing = latest.get(r.interval_start_utc);
-    if (!existing || r.publish_time_utc > existing.publish_time_utc) {
-      latest.set(r.interval_start_utc, r);
-    }
+    if (!seen.has(r.intervalstarttime)) seen.set(r.intervalstarttime, r);
   }
 
-  const docs = [...latest.values()];
+  const docs = [...seen.values()];
   if (docs.length === 0) {
     console.log("[loadForecast] no records returned from GridStatus");
     return ok({ updated: 0 }, origin);
@@ -33,7 +30,7 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const result = await db.collection(Collections.ercotLoadForecast).bulkWrite(
     docs.map((r) => ({
       updateOne: {
-        filter: { interval_start_utc: r.interval_start_utc },
+        filter: { intervalstarttime: r.intervalstarttime },
         update: { $set: { ...r, _fetchedAt: now } },
         upsert: true,
       },

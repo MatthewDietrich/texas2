@@ -28,21 +28,20 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
   const zoneName = ((zoneDoc as any).properties.NAME as string).toLowerCase();
 
   const now = new Date();
-  const sampleDoc = await db.collection(Collections.ercotLoadForecast).findOne({});
-  console.log("[energy] sample forecast doc:", JSON.stringify(sampleDoc));
-  console.log("[energy] querying interval_start_utc >=", now.toISOString());
-  const forecastDocs = await db
-    .collection(Collections.ercotLoadForecast)
-    .find(
-      { interval_start_utc: { $gte: now.toISOString() } },
-      { projection: { _id: 0, _fetchedAt: 0 }, sort: { interval_start_utc: 1 } },
-    )
-    .limit(4)
-    .toArray();
-  console.log("[energy] forecastDocs count:", forecastDocs.length);
+  const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+  const forecastDocs = (
+    await db
+      .collection(Collections.ercotLoadForecast)
+      .find(
+        { intervalstarttime: { $gte: fiveHoursAgo.toISOString() } },
+        { projection: { _id: 0, _fetchedAt: 0 }, sort: { intervalstarttime: -1 } },
+      )
+      .limit(4)
+      .toArray()
+  ).reverse();
 
   const loadForecast = forecastDocs.map((r: any) => ({
-    intervalStart: r.interval_start_utc,
+    intervalStart: r.intervalstarttime,
     systemMW: Math.round(r.system_total),
     zoneMW: zoneName != null ? Math.round(r[zoneName] ?? 0) : null,
   }));
