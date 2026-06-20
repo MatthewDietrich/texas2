@@ -36,6 +36,9 @@ export async function getCctvSnapshot(
   if (!res.ok) {
     throw new Error(`TxDOT snapshot API ${res.status} for "${icdId}"`);
   }
-  const data = (await res.json()) as TxDotCameraSnapshot;
+  const data = (await res.json()) as TxDotCameraSnapshot | null;
+  if (!data?.snippet) {
+    throw new Error(`TxDOT snapshot returned no data for "${icdId}"`);
+  }
   return data.snippet;
 }

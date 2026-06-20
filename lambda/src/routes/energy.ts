@@ -67,6 +67,20 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
     getLoadForecast({ DeliveryDate: today, size: "24" }),
   ]);
 
+  if (sppResult.status === "rejected") {
+    console.error("[energy] SPP call failed:", sppResult.reason);
+  } else {
+    const { _meta, data } = sppResult.value;
+    console.log(`[energy] SPP meta:`, _meta, `| first record:`, JSON.stringify(data?.[0]));
+  }
+
+  if (forecastResult.status === "rejected") {
+    console.error("[energy] forecast call failed:", forecastResult.reason);
+  } else {
+    const { _meta, data } = forecastResult.value;
+    console.log(`[energy] forecast meta:`, _meta, `| first record:`, JSON.stringify(data?.[0]));
+  }
+
   const sppRecords =
     sppResult.status === "fulfilled" ? sppResult.value.data : [];
   const recentPrices = sppRecords.map((r) => ({
