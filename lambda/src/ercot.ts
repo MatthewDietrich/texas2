@@ -33,8 +33,10 @@ function getConfig(): ErcotConfig {
 
 async function getToken(config: ErcotConfig): Promise<string> {
   if (tokenCache && Date.now() < tokenCache.expiresAt) {
+    console.log("[ercot] using cached token");
     return tokenCache.idToken;
   }
+  console.log("[ercot] fetching new token");
 
   const body = new URLSearchParams({
     grant_type: "password",
@@ -77,6 +79,8 @@ async function fetchErcot<T>(
     url.searchParams.set(k, v);
   }
 
+  console.log(`[ercot] GET ${url.toString()}`);
+
   const res = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -85,11 +89,14 @@ async function fetchErcot<T>(
     signal: AbortSignal.timeout(10_000),
   });
 
+  const body = await res.text();
+  console.log(`[ercot] ${endpoint} → ${res.status} (${body.length} bytes):`, body.slice(0, 300));
+
   if (!res.ok) {
-    throw new Error(`ERCOT API ${res.status} for ${endpoint}`);
+    throw new Error(`ERCOT API ${res.status} for ${endpoint}: ${body.slice(0, 200)}`);
   }
 
-  return res.json() as Promise<T>;
+  return JSON.parse(body) as T;
 }
 
 // ── Response shapes ───────────────────────────────────────────────────────────
