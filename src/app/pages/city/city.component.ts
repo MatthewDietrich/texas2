@@ -6,7 +6,7 @@ import {
   effect,
   computed,
 } from "@angular/core";
-import { DecimalPipe } from "@angular/common";
+import { DecimalPipe, DatePipe } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
 import { FooterComponent } from "../../components/footer/footer.component";
@@ -32,7 +32,7 @@ const TX = { north: 36.5, south: 25.84, west: -106.65, east: -93.51 };
 @Component({
   selector: "app-city",
   standalone: true,
-  imports: [RouterLink, NavBarComponent, FooterComponent, DecimalPipe],
+  imports: [RouterLink, NavBarComponent, FooterComponent, DecimalPipe, DatePipe],
   templateUrl: "./city.component.html",
   styles: [
     `
