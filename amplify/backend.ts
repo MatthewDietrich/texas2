@@ -32,7 +32,6 @@ class TexasCityApiStack extends Stack {
       process.env.AMPLIFY_APP_URL ?? "",
       process.env.CUSTOM_DOMAIN_URL ?? "",
       process.env.DEV_CUSTOM_DOMAIN_URL ?? "",
-      "http://localhost:4200",
     ].filter(Boolean);
 
     // CORS is owned entirely here — the Lambda itself sets no Access-Control-* headers.

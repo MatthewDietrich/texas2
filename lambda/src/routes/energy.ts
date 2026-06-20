@@ -4,19 +4,6 @@ import { getCityCoords } from "../cityCoords";
 import { getDb } from "../db";
 import { Collections } from "../collections";
 
-// Maps ERCOT load zone NAME to the matching field in GridStatus ercot_load_forecast_by_forecast_zone.
-// GridStatus columns: houston | north | south | west
-const ZONE_TO_FIELD: Record<string, string> = {
-  HOUSTON: "houston",
-  NORTH: "north",
-  "NORTH CENTRAL": "north",
-  NORTHWEST: "north",
-  SOUTH: "south",
-  "SOUTH CENTRAL": "south",
-  WEST: "west",
-  "FAR WEST": "west",
-};
-
 /** GET /cities/:name/energy */
 export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
   const coords = await getCityCoords(params.name);
@@ -38,8 +25,7 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
     return ok({ loadZone: null, loadForecast: [] }, origin, 300);
   }
 
-  const zoneName = (zoneDoc as any).properties.NAME as string;
-  const zoneField = ZONE_TO_FIELD[zoneName.toUpperCase()] ?? null;
+  const zoneName = ((zoneDoc as any).properties.NAME as string).toLowerCase();
 
   const now = new Date();
   const forecastDocs = await db
@@ -54,7 +40,7 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
   const loadForecast = forecastDocs.map((r: any) => ({
     intervalStart: r.interval_start_utc,
     systemMW: Math.round(r.system_total),
-    zoneMW: zoneField != null ? Math.round(r[zoneField] ?? 0) : null,
+    zoneMW: zoneName != null ? Math.round(r[zoneName] ?? 0) : null,
   }));
 
   return ok({ loadZone: zoneName, loadForecast }, origin, 300);
