@@ -28,12 +28,6 @@
               <div class="k">Population</div>
               <div class="v mono">{{ population() }}</div>
             </div>
-            @if (c.ercotLoadZone) {
-              <div class="stat">
-                <div class="k">ERCOT Load Zone</div>
-                <div class="v mono">{{ c.ercotLoadZone }}</div>
-              </div>
-            }
             <div class="stat">
               <div class="k">Searched</div>
               <div class="v mono">{{ timesSearched() }}×</div>
@@ -488,7 +482,7 @@
             <div class="card card-pad mb5" style="max-width: 320px">
               <div class="drow" style="border-bottom: none; padding-top: 0">
                 <span class="dname">ERCOT load zone</span>
-                <span class="ddist mono">{{ e.loadZone }}</span>
+                <span class="ddist mono">{{ e.loadZone.charAt(0).toUpperCase() + e.loadZone.slice(1).toLowerCase() }}</span>
               </div>
             </div>
 
