@@ -28,6 +28,9 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
   const zoneName = ((zoneDoc as any).properties.NAME as string).toLowerCase();
 
   const now = new Date();
+  const sampleDoc = await db.collection(Collections.ercotLoadForecast).findOne({});
+  console.log("[energy] sample forecast doc:", JSON.stringify(sampleDoc));
+  console.log("[energy] querying interval_start_utc >=", now.toISOString());
   const forecastDocs = await db
     .collection(Collections.ercotLoadForecast)
     .find(
@@ -36,6 +39,7 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
     )
     .limit(4)
     .toArray();
+  console.log("[energy] forecastDocs count:", forecastDocs.length);
 
   const loadForecast = forecastDocs.map((r: any) => ({
     intervalStart: r.interval_start_utc,
