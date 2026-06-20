@@ -49,6 +49,7 @@ async function getToken(config: ErcotConfig): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!res.ok) {
@@ -81,6 +82,7 @@ async function fetchErcot<T>(
       Authorization: `Bearer ${token}`,
       "Ocp-Apim-Subscription-Key": config.subscriptionKey,
     },
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!res.ok) {
