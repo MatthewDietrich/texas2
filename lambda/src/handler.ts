@@ -21,6 +21,7 @@ import { refreshDistrict } from "./routes/districts";
 import { refreshReservoirs } from "./routes/reservoirs";
 import { updateSirens } from "./routes/sirens";
 import { getEnergyForCity } from "./routes/energy";
+import { refreshLoadForecast } from "./routes/loadForecast";
 
 // ── Route table ──────────────────────────────────────────────────────────────
 // Pattern groups become named params (keys array must match group order).
@@ -118,6 +119,13 @@ const ROUTES: Route[] = [
     keys: [],
     handler: updateSirens,
   },
+  // Load forecast — writes
+  {
+    method: "POST",
+    pattern: /^\/load-forecast\/refresh$/,
+    keys: [],
+    handler: refreshLoadForecast,
+  },
 ];
 
 // ── Handler ──────────────────────────────────────────────────────────────────
@@ -133,11 +141,17 @@ export const handler = async (
   event: APIGatewayProxyEventV2 | { source: string },
 ): Promise<APIGatewayProxyResultV2 | void> => {
   if ("source" in event && event.source === "aws.events") {
-    console.log("[scheduler] running daily refresh");
-    await Promise.all([
-      refreshReservoirs(SCHEDULED_CTX),
-      updateSirens(SCHEDULED_CTX),
-    ]);
+    const detailType = (event as any)["detail-type"] as string | undefined;
+    if (detailType === "load-forecast-refresh") {
+      console.log("[scheduler] running load forecast refresh");
+      await refreshLoadForecast(SCHEDULED_CTX);
+    } else {
+      console.log("[scheduler] running daily refresh");
+      await Promise.all([
+        refreshReservoirs(SCHEDULED_CTX),
+        updateSirens(SCHEDULED_CTX),
+      ]);
+    }
     return;
   }
 

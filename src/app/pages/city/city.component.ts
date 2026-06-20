@@ -323,20 +323,6 @@ export class CityComponent {
     }
   }
 
-  priceColor(price: number): string {
-    if (price < 0) return "var(--blue, #3b82f6)";
-    if (price < 50) return "var(--text)";
-    if (price < 150) return "#f59e0b";
-    return "var(--accent)";
-  }
-
-  priceBarHeight(price: number, prices: { price: number }[]): number {
-    const max = Math.max(...prices.map((p) => p.price), 1);
-    const min = Math.min(...prices.map((p) => p.price), 0);
-    const range = max - min || 1;
-    return Math.max(4, ((price - min) / range) * 100);
-  }
-
   loadBarWidth(mw: number, forecast: { systemMW: number }[]): number {
     const max = Math.max(...forecast.map((f) => f.systemMW), 1);
     return Math.max(4, (mw / max) * 100);

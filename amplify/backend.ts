@@ -22,9 +22,7 @@ class TexasCityApiStack extends Stack {
       environment: {
         MONGODB_URI: process.env.MONGODB_URI ?? "",
         MONGODB_DB: process.env.MONGODB_DB ?? "texas",
-        ERCOT_USERNAME: process.env.ERCOT_USERNAME ?? "",
-        ERCOT_PASSWORD: process.env.ERCOT_PASSWORD ?? "",
-        ERCOT_SUBSCRIPTION_KEY: process.env.ERCOT_SUBSCRIPTION_KEY ?? "",
+        GRIDSTATUS_API_KEY: process.env.GRIDSTATUS_API_KEY ?? "",
       },
     });
 
@@ -51,6 +49,18 @@ class TexasCityApiStack extends Stack {
     new events.Rule(this, "DailyRefreshRule", {
       schedule: events.Schedule.rate(Duration.days(1)),
       targets: [new targets.LambdaFunction(apiHandler)],
+    });
+
+    new events.Rule(this, "HourlyLoadForecastRule", {
+      schedule: events.Schedule.rate(Duration.hours(1)),
+      targets: [
+        new targets.LambdaFunction(apiHandler, {
+          event: events.RuleTargetInput.fromObject({
+            source: "aws.events",
+            "detail-type": "load-forecast-refresh",
+          }),
+        }),
+      ],
     });
 
     new CfnOutput(this, "ApiUrl", {
