@@ -22,6 +22,9 @@ class TexasCityApiStack extends Stack {
       environment: {
         MONGODB_URI: process.env.MONGODB_URI ?? "",
         MONGODB_DB: process.env.MONGODB_DB ?? "texas",
+        ERCOT_USERNAME: process.env.ERCOT_USERNAME ?? "",
+        ERCOT_PASSWORD: process.env.ERCOT_PASSWORD ?? "",
+        ERCOT_SUBSCRIPTION_KEY: process.env.ERCOT_SUBSCRIPTION_KEY ?? "",
       },
     });
 
