@@ -83,6 +83,13 @@
         >
           <svg class="ic"><use href="#i-car"></use></svg> Infrastructure
         </button>
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'energy'"
+          (click)="activeTab.set('energy')"
+        >
+          <svg class="ic"><use href="#i-zap"></use></svg> Electricity
+        </button>
       </div>
       @if (weather()?.alerts?.length) {
         @for (a of weather()!.alerts; track a.id) {
@@ -465,6 +472,145 @@
                 >.
               </p>
             </div>
+          }
+        }
+      </section>
+      <!-- ELECTRICITY -->
+      <section class="tabpanel" [class.active]="activeTab() === 'energy'">
+        @if (energyLoading()) {
+          <p class="muted mt4">Loading electricity data…</p>
+        } @else if (energyError()) {
+          <p style="color: var(--accent)">{{ energyError() }}</p>
+        } @else if (!energy()?.loadZone) {
+          <p class="muted mt4">No ERCOT data available for this location.</p>
+        } @else {
+          @if (energy(); as e) {
+            <div class="wx-2col mb6">
+              <div>
+                <h3 class="card-title mb4">Real-time settlement price</h3>
+                <div class="card card-pad">
+                  @if (e.currentPrice) {
+                    <div style="margin-bottom: var(--s4)">
+                      <div
+                        style="
+                          font-size: 2.25rem;
+                          font-weight: 700;
+                          line-height: 1;
+                          font-variant-numeric: tabular-nums;
+                        "
+                        [style.color]="priceColor(e.currentPrice.price)"
+                      >
+                        {{ e.currentPrice.price | number: "1.2-2" }}
+                        <span
+                          style="
+                            font-size: 1rem;
+                            font-weight: 400;
+                            color: var(--text-muted);
+                          "
+                          >$/MWh</span
+                        >
+                      </div>
+                      <div
+                        class="muted"
+                        style="font-size: 13px; margin-top: var(--s2)"
+                      >
+                        {{ e.settlementPoint }} ·
+                        {{
+                          e.currentPrice.timestamp
+                            | date: "h:mm a" : "America/Chicago"
+                        }}
+                      </div>
+                    </div>
+                    @if (e.recentPrices.length > 1) {
+                      <div
+                        style="
+                          display: flex;
+                          align-items: flex-end;
+                          gap: 3px;
+                          height: 48px;
+                          margin-top: var(--s4);
+                        "
+                      >
+                        @for (p of e.recentPrices; track p.timestamp) {
+                          <div
+                            style="
+                              flex: 1;
+                              border-radius: 2px;
+                              background: var(--border-strong);
+                              transition: background 0.15s;
+                            "
+                            [style.height.%]="
+                              priceBarHeight(p.price, e.recentPrices)
+                            "
+                            [style.background]="
+                              $last ? priceColor(p.price) : undefined
+                            "
+                            [title]="(p.price | number: '1.2-2') + ' $/MWh'"
+                          ></div>
+                        }
+                      </div>
+                      <div
+                        class="muted"
+                        style="font-size: 12px; margin-top: var(--s2)"
+                      >
+                        Last {{ e.recentPrices.length }} intervals
+                      </div>
+                    }
+                  } @else {
+                    <p class="muted"><em>Price data unavailable.</em></p>
+                  }
+                </div>
+              </div>
+
+              <div>
+                <h3 class="card-title mb4">Load zone</h3>
+                <div class="card card-pad">
+                  <div class="drow" style="border-bottom: none">
+                    <span class="dname">ERCOT zone</span>
+                    <span class="ddist mono">{{ e.loadZone }}</span>
+                  </div>
+                  <div class="drow" style="border-bottom: none">
+                    <span class="dname">Settlement point</span>
+                    <span class="ddist mono">{{ e.settlementPoint }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            @if (e.loadForecast.length) {
+              <h3 class="card-title mb4">Today's load forecast</h3>
+              <div class="card card-pad">
+                <div class="forecast">
+                  @for (f of e.loadForecast; track f.hourEnding) {
+                    <div class="fc-row">
+                      <span class="fc-day" style="width: 3.5rem">{{
+                        f.hourEnding
+                      }}</span>
+                      <span
+                        class="fc-bar"
+                        style="margin-left: 0"
+                        [style.width.%]="
+                          loadBarWidth(f.systemMW, e.loadForecast)
+                        "
+                      ></span>
+                      <span class="fc-temps">
+                        <span
+                          >{{ f.systemMW | number }}
+                          <span class="lo">MW</span></span
+                        >
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <p class="src-line mt5">
+              Prices and forecasts from
+              <a href="https://www.ercot.com" target="_blank" rel="noreferrer"
+                >ERCOT</a
+              >.
+            </p>
           }
         }
       </section>

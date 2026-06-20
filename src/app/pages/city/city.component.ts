@@ -15,12 +15,14 @@ import { getCity, recordSearch } from "../../../api/cities";
 import { getCamerasForCity } from "../../../api/cameras";
 import { getWeather } from "../../../api/weather";
 import { getTransportation } from "../../../api/transportation";
+import { getEnergy } from "../../../api/energy";
 import type { City } from "../../../api/cities";
 import type { Camera } from "../../../api/cameras";
 import type { Weather, WeatherDay } from "../../../api/weather";
 import type { Transportation } from "../../../api/transportation";
+import type { Energy } from "../../../api/energy";
 
-type Tab = "snap" | "weather" | "water" | "infra";
+type Tab = "snap" | "weather" | "water" | "infra" | "energy";
 
 const CAMERA_PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
 
@@ -151,6 +153,9 @@ export class CityComponent {
   transportation = signal<Transportation | null>(null);
   transLoading = signal(true);
   transError = signal<string | null>(null);
+  energy = signal<Energy | null>(null);
+  energyLoading = signal(true);
+  energyError = signal<string | null>(null);
 
   activeTab = signal<Tab>("snap");
 
@@ -202,6 +207,7 @@ export class CityComponent {
       this.loadCameras(name);
       this.loadWeather(name);
       this.loadTransportation(name);
+      this.loadEnergy(name);
       recordSearch(name).catch(() => {});
     });
   }
@@ -301,6 +307,39 @@ export class CityComponent {
     if (i === 0) return "Today";
     const d = new Date(date + "T12:00:00");
     return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+  }
+
+  private async loadEnergy(name: string): Promise<void> {
+    this.energyLoading.set(true);
+    this.energyError.set(null);
+    try {
+      this.energy.set(await getEnergy(name));
+    } catch (err) {
+      this.energyError.set(
+        err instanceof Error ? err.message : "Request failed",
+      );
+    } finally {
+      this.energyLoading.set(false);
+    }
+  }
+
+  priceColor(price: number): string {
+    if (price < 0) return "var(--blue, #3b82f6)";
+    if (price < 50) return "var(--text)";
+    if (price < 150) return "#f59e0b";
+    return "var(--accent)";
+  }
+
+  priceBarHeight(price: number, prices: { price: number }[]): number {
+    const max = Math.max(...prices.map((p) => p.price), 1);
+    const min = Math.min(...prices.map((p) => p.price), 0);
+    const range = max - min || 1;
+    return Math.max(4, ((price - min) / range) * 100);
+  }
+
+  loadBarWidth(mw: number, forecast: { systemMW: number }[]): number {
+    const max = Math.max(...forecast.map((f) => f.systemMW), 1);
+    return Math.max(4, (mw / max) * 100);
   }
 
   windDirLabel(deg: number): string {

@@ -58,7 +58,7 @@ class TexasCityApiStack extends Stack {
   }
 }
 
-const branch = process.env.AMPLIFY_BRANCH ?? "main";
+const branch = process.env.AWS_BRANCH ?? process.env.AMPLIFY_BRANCH ?? "main";
 const stackName =
   branch === "main" ? "TexasCityApiStack" : `TexasCityApiStack-${branch}`;
 

@@ -20,6 +20,7 @@ import { getTransportationForCity } from "./routes/transportation";
 import { refreshDistrict } from "./routes/districts";
 import { refreshReservoirs } from "./routes/reservoirs";
 import { updateSirens } from "./routes/sirens";
+import { getEnergyForCity } from "./routes/energy";
 
 // ── Route table ──────────────────────────────────────────────────────────────
 // Pattern groups become named params (keys array must match group order).
@@ -56,6 +57,12 @@ const ROUTES: Route[] = [
     pattern: /^\/cities\/([^/]+)\/transportation$/,
     keys: ["name"],
     handler: getTransportationForCity,
+  },
+  {
+    method: "GET",
+    pattern: /^\/cities\/([^/]+)\/energy$/,
+    keys: ["name"],
+    handler: getEnergyForCity,
   },
   {
     method: "GET",
