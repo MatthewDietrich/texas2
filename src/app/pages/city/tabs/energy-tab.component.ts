@@ -28,6 +28,10 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
         font-size: 13px;
         white-space: nowrap;
       }
+      .unit {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
       .src-line {
         color: var(--text-subtle);
         font-size: 13px;
@@ -61,12 +65,12 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
                     @if (f.zoneMW != null) {
                       <span
                         >{{ f.zoneMW | number }}
-                        <span class="lo">MW zone</span></span
+                        <span class="unit">MW zone</span></span
                       >
                     }
                     <span
                       >{{ f.systemMW | number }}
-                      <span class="lo">MW system</span></span
+                      <span class="unit">MW system</span></span
                     >
                   </span>
                 </div>
