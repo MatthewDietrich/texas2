@@ -28,6 +28,20 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
         font-size: 13px;
         white-space: nowrap;
       }
+      .e-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .e-row:last-child {
+        border-bottom: none;
+      }
+      .e-time {
+        font-weight: 600;
+        font-size: 14.5px;
+      }
       .mw-vals {
         display: flex;
         gap: var(--s4);
@@ -62,8 +76,8 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
           <div class="card card-pad">
             <div class="forecast">
               @for (f of e.loadForecast; track f.intervalStart) {
-                <div class="fc-row">
-                  <span class="fc-day" style="width: 4rem">
+                <div class="e-row">
+                  <span class="e-time">
                     {{ f.intervalStart | date: "h a" : "America/Chicago" }}
                   </span>
                   <span class="mw-vals">
