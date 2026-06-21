@@ -6,6 +6,18 @@ import { fetchLoadForecast, type LoadForecastRecord } from "../gridstatus";
 
 export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const now = new Date();
+  const db = await getDb();
+
+  const latest = await db
+    .collection(Collections.ercotLoadForecast)
+    .findOne({}, { sort: { _fetchedAt: -1 }, projection: { _fetchedAt: 1 } });
+
+  const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+  if (latest?._fetchedAt && latest._fetchedAt > fourHoursAgo) {
+    console.log("[loadForecast] data is fresh, skipping GridStatus fetch");
+    return ok({ updated: 0, skipped: true }, origin);
+  }
+
   const startOfHour = new Date(now);
   startOfHour.setMinutes(0, 0, 0);
   const end = new Date(startOfHour.getTime() + 4 * 60 * 60 * 1000);
@@ -33,7 +45,6 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
     return ok({ updated: 0 }, origin);
   }
 
-  const db = await getDb();
   const result = await db.collection(Collections.ercotLoadForecast).bulkWrite(
     docs.map((r) => ({
       updateOne: {
