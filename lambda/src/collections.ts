@@ -8,4 +8,5 @@ export const Collections = {
   highway: "highway",
   reservoir: "reservoir",
   siren: "siren",
+  ercotLoadForecast: "ercot_load_forecast",
 } as const;

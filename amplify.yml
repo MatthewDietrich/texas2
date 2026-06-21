@@ -15,7 +15,7 @@ frontend:
     build:
       commands:
         - |
-          if [ "${AMPLIFY_BRANCH}" = "dev" ]; then
+          if [ "${AWS_BRANCH}" = "dev" ] || [ "${AMPLIFY_BRANCH}" = "dev" ]; then
             RESOLVED_API_URL="${API_URL_DEV:-}"
           else
             RESOLVED_API_URL="${API_URL:-}"

@@ -22,6 +22,7 @@ class TexasCityApiStack extends Stack {
       environment: {
         MONGODB_URI: process.env.MONGODB_URI ?? "",
         MONGODB_DB: process.env.MONGODB_DB ?? "texas",
+        GRIDSTATUS_API_KEY: process.env.GRIDSTATUS_API_KEY ?? "",
       },
     });
 
@@ -31,7 +32,6 @@ class TexasCityApiStack extends Stack {
       process.env.AMPLIFY_APP_URL ?? "",
       process.env.CUSTOM_DOMAIN_URL ?? "",
       process.env.DEV_CUSTOM_DOMAIN_URL ?? "",
-      "http://localhost:4200",
     ].filter(Boolean);
 
     // CORS is owned entirely here — the Lambda itself sets no Access-Control-* headers.
@@ -50,6 +50,18 @@ class TexasCityApiStack extends Stack {
       targets: [new targets.LambdaFunction(apiHandler)],
     });
 
+    new events.Rule(this, "HourlyLoadForecastRule", {
+      schedule: events.Schedule.rate(Duration.hours(1)),
+      targets: [
+        new targets.LambdaFunction(apiHandler, {
+          event: events.RuleTargetInput.fromObject({
+            source: "aws.events",
+            "detail-type": "load-forecast-refresh",
+          }),
+        }),
+      ],
+    });
+
     new CfnOutput(this, "ApiUrl", {
       value: fnUrl.url,
       description: "Texas City Snapshot API URL — set this as VITE_API_URL",
@@ -58,7 +70,7 @@ class TexasCityApiStack extends Stack {
   }
 }
 
-const branch = process.env.AMPLIFY_BRANCH ?? "main";
+const branch = process.env.AWS_BRANCH ?? process.env.AMPLIFY_BRANCH ?? "main";
 const stackName =
   branch === "main" ? "TexasCityApiStack" : `TexasCityApiStack-${branch}`;
 

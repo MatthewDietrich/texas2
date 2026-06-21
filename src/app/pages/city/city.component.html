@@ -28,12 +28,10 @@
               <div class="k">Population</div>
               <div class="v mono">{{ population() }}</div>
             </div>
-            @if (c.ercotLoadZone) {
-              <div class="stat">
-                <div class="k">ERCOT Load Zone</div>
-                <div class="v mono">{{ c.ercotLoadZone }}</div>
-              </div>
-            }
+            <div class="stat">
+              <div class="k">ERCOT Load Zone</div>
+              <div class="v mono">{{ c.ercotLoadZone ?? "(none)" }}</div>
+            </div>
             <div class="stat">
               <div class="k">Searched</div>
               <div class="v mono">{{ timesSearched() }}×</div>
@@ -83,6 +81,13 @@
         >
           <svg class="ic"><use href="#i-car"></use></svg> Infrastructure
         </button>
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'energy'"
+          (click)="activeTab.set('energy')"
+        >
+          <svg class="ic"><use href="#i-zap"></use></svg> Electricity
+        </button>
       </div>
       @if (weather()?.alerts?.length) {
         @for (a of weather()!.alerts; track a.id) {
@@ -100,373 +105,24 @@
     </div>
 
     <div class="panels">
-      <!-- SNAPSHOTS -->
       <section class="tabpanel" [class.active]="activeTab() === 'snap'">
-        <div class="flex between center mb4">
-          <h2 class="h-section">Live road cameras</h2>
-        </div>
-        @if (camsError()) {
-          <p style="color: var(--accent)">{{ camsError() }}</p>
-        }
-        @if (!camsLoading() && !camsError() && cameras()?.length === 0) {
-          <p class="muted">No cameras found near this city.</p>
-        }
-        <div class="cam-grid">
-          @if (camsLoading()) {
-            @for (i of cameraPlaceholders; track i) {
-              <article class="cam">
-                <div class="cam-thumb"><span class="ph">Loading…</span></div>
-                <div class="cam-meta"><span class="cam-id">&nbsp;</span></div>
-              </article>
-            }
-          } @else {
-            @for (cam of cameras() ?? []; track cam.icdId) {
-              <article class="cam">
-                <div class="cam-thumb">
-                  @if (cam.snapshot) {
-                    <img
-                      [src]="'data:image/jpeg;base64,' + cam.snapshot"
-                      [alt]="cam.icdId"
-                    />
-                  } @else {
-                    <div class="cam-unavailable">
-                      <svg class="ic"><use href="#i-camera-off"></use></svg>
-                      <span>Camera image unavailable</span>
-                    </div>
-                  }
-                </div>
-                <div class="cam-meta">
-                  <a [routerLink]="['/camera', cam.icdId]" class="cam-id">{{
-                    cam.icdId
-                  }}</a>
-                </div>
-              </article>
-            }
-          }
-        </div>
-        <p class="src-line mt5">
-          Camera snapshots from the
-          <a
-            href="https://www.txdot.gov/discover/live-traffic-cameras.html"
-            target="_blank"
-            rel="noreferrer"
-            >Texas Department of Transportation</a
-          >.
-        </p>
+        <app-snap-tab [cityName]="cityName()" />
       </section>
-
-      <!-- WEATHER -->
       <section class="tabpanel" [class.active]="activeTab() === 'weather'">
-        @if (weatherLoading()) {
-          <p class="muted mt4">Loading weather…</p>
-        } @else if (weatherError()) {
-          <p style="color: var(--accent)">{{ weatherError() }}</p>
-        } @else {
-          @if (weather(); as w) {
-            <div class="card card-pad mb5">
-              <div class="now-card">
-                <div class="now-temp">
-                  <span class="wi">{{
-                    wmoIcon(w.current.weatherCode, w.current.isDay)
-                  }}</span>
-                  <div>
-                    <div class="deg">{{ w.current.tempF }}°</div>
-                    <div class="cond">
-                      <div class="c">{{ wmoLabel(w.current.weatherCode) }}</div>
-                      <div class="f">
-                        Feels like {{ w.current.feelsLikeF }}°
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="now-grid">
-                  <div class="metric">
-                    <span class="k"
-                      ><span class="wi">&#xf07a;</span> Humidity</span
-                    >
-                    <span class="v">{{ w.current.humidity }}%</span>
-                  </div>
-                  <div class="metric">
-                    <span class="k"
-                      ><span class="wi">&#xf04e;</span> Precip.</span
-                    >
-                    <span class="v">{{ w.current.precipProbability }}%</span>
-                  </div>
-                  <div class="metric">
-                    <span class="k"
-                      ><span class="wi">&#xf041;</span> Cloud cover</span
-                    >
-                    <span class="v">{{ w.current.cloudCover }}%</span>
-                  </div>
-                  <div class="metric">
-                    <span class="k"><span class="wi">&#xf050;</span> Wind</span>
-                    <span class="v"
-                      >{{ w.current.windMph }} mph
-                      {{ windDirLabel(w.current.windDir) }}</span
-                    >
-                  </div>
-                  <div class="metric">
-                    <span class="k"
-                      ><span class="wi">&#xf079;</span> Pressure</span
-                    >
-                    <span class="v">{{ w.current.pressureMb }} mb</span>
-                  </div>
-                  <div class="metric">
-                    <span class="k"
-                      ><span class="wi">&#xf055;</span> Dew point</span
-                    >
-                    <span class="v">{{ w.current.dewPointF }}°</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <h3 class="card-title mb4">Next 12 hours</h3>
-            <div class="hourly mb6">
-              @for (h of w.hourly; track h.time; let i = $index) {
-                <div class="hour" [class.peak]="i === 0">
-                  <div class="t">{{ hourLabel(h.time, i) }}</div>
-                  <span class="wi">{{ wmoIcon(h.weatherCode, h.isDay) }}</span>
-                  <div class="deg">{{ h.tempF }}°</div>
-                  <div class="pp">{{ h.precipProbability }}%</div>
-                </div>
-              }
-            </div>
-
-            <div class="wx-2col">
-              <div>
-                <h3 class="card-title mb4">7-day forecast</h3>
-                <div class="card card-pad">
-                  <div class="forecast">
-                    @for (f of w.daily; track f.date; let i = $index) {
-                      <div class="fc-row">
-                        <span class="fc-day">{{ dayLabel(f.date, i) }}</span>
-                        <span class="wi">{{
-                          wmoIcon(f.weatherCode, true)
-                        }}</span>
-                        <span
-                          class="fc-bar"
-                          [style.margin-left.%]="barLeft(f)"
-                          [style.width.%]="barWidth(f)"
-                        ></span>
-                        <span class="fc-temps"
-                          ><span>{{ f.highF }}°</span
-                          ><span class="lo">{{ f.lowF }}°</span></span
-                        >
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 class="card-title mb4">Almanac for {{ almanacLabel }}</h3>
-                <div class="card card-pad">
-                  <table class="dtable" style="font-size: 14px">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th class="num">1 yr</th>
-                        <th class="num">5 yr</th>
-                        <th class="num">10 yr</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>High</td>
-                        <td class="num">
-                          {{ w.almanac.yr1 ? w.almanac.yr1.highF + "°" : "—" }}
-                        </td>
-                        <td class="num">
-                          {{ w.almanac.yr5 ? w.almanac.yr5.highF + "°" : "—" }}
-                        </td>
-                        <td class="num">
-                          {{
-                            w.almanac.yr10 ? w.almanac.yr10.highF + "°" : "—"
-                          }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Low</td>
-                        <td class="num">
-                          {{ w.almanac.yr1 ? w.almanac.yr1.lowF + "°" : "—" }}
-                        </td>
-                        <td class="num">
-                          {{ w.almanac.yr5 ? w.almanac.yr5.lowF + "°" : "—" }}
-                        </td>
-                        <td class="num">
-                          {{ w.almanac.yr10 ? w.almanac.yr10.lowF + "°" : "—" }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Precip.</td>
-                        <td class="num">
-                          {{
-                            w.almanac.yr1 ? w.almanac.yr1.precipIn + '"' : "—"
-                          }}
-                        </td>
-                        <td class="num">
-                          {{
-                            w.almanac.yr5 ? w.almanac.yr5.precipIn + '"' : "—"
-                          }}
-                        </td>
-                        <td class="num">
-                          {{
-                            w.almanac.yr10 ? w.almanac.yr10.precipIn + '"' : "—"
-                          }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          }
-        }
-        <p class="src-line mt5">
-          Forecasts by
-          <a href="https://open-meteo.com" target="_blank" rel="noreferrer"
-            >Open-Meteo</a
-          >
-          · Alerts by the
-          <a href="https://weather.gov/alerts" target="_blank" rel="noreferrer"
-            >National Weather Service</a
-          >.
-        </p>
+        <app-weather-tab
+          [weather]="weather()"
+          [loading]="weatherLoading()"
+          [error]="weatherError()"
+        />
       </section>
-
-      <!-- WATER -->
       <section class="tabpanel" [class.active]="activeTab() === 'water'">
-        <div class="flex between center mb5">
-          <h2 class="h-section">Reservoirs near {{ cityName() }}</h2>
-          <span class="subtle mono" style="font-size: 13px"
-            >updated 24h ago</span
-          >
-        </div>
-        @if (city()?.reservoirs?.length) {
-          <div class="card card-pad">
-            <div class="res">
-              @for (r of city()!.reservoirs!; track r.name) {
-                <div class="res-row">
-                  <div class="res-head">
-                    <div>
-                      <span class="res-name">{{ r.name }}</span>
-                      @if (r.nearestCity) {
-                        <span class="res-near"> near {{ r.nearestCity }}</span>
-                      }
-                    </div>
-                    <span class="res-pct">
-                      @if (r.percentFull != null) {
-                        {{ r.percentFull }}%
-                      } @else {
-                        —
-                      }
-                    </span>
-                  </div>
-                  <div class="res-track">
-                    <div
-                      class="res-fill"
-                      [style.width.%]="r.percentFull ?? 0"
-                    ></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        } @else {
-          <p class="muted"><em>No reservoir data available.</em></p>
-        }
-        <p class="src-line mt5">
-          Source:
-          <a
-            href="https://waterdatafortexas.org"
-            target="_blank"
-            rel="noreferrer"
-            >Water Data for Texas</a
-          >.
-        </p>
+        <app-water-tab [city]="city()" />
       </section>
-
-      <!-- TRANSPORTATION -->
       <section class="tabpanel" [class.active]="activeTab() === 'infra'">
-        @if (transLoading()) {
-          <p class="muted mt4">Loading transportation data…</p>
-        } @else if (transError()) {
-          <p style="color: var(--accent)">{{ transError() }}</p>
-        } @else {
-          <div class="wx-2col">
-            <div>
-              <h3 class="card-title mb4">Nearest airports</h3>
-              <div class="card card-pad">
-                @if (transportation()?.airports?.length) {
-                  <div class="dlist">
-                    @for (a of transportation()!.airports; track a.name) {
-                      <div class="drow">
-                        <span class="dname">{{ a.name }}</span>
-                        <span class="ddist">{{ a.distanceMiles }} mi</span>
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <p class="muted"><em>No nearby airports found.</em></p>
-                }
-              </div>
-            </div>
-            <div>
-              <h3 class="card-title mb4">Nearest highways</h3>
-              <div class="card card-pad">
-                @if (transportation()?.highways?.length) {
-                  <div class="dlist">
-                    @for (h of transportation()!.highways; track h.name) {
-                      <div class="drow">
-                        <span class="dname">{{ h.name }}</span>
-                        <span class="ddist">{{ h.distanceMiles }} mi</span>
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <p class="muted"><em>No nearby highways found.</em></p>
-                }
-              </div>
-            </div>
-          </div>
-          @if (city()?.sirens?.length) {
-            <div class="mt5">
-              <h3 class="card-title mb4">Outdoor warning sirens</h3>
-              <div class="card card-pad">
-                <div class="dlist">
-                  @for (s of city()!.sirens!; track s.name) {
-                    <div class="drow">
-                      <div>
-                        <span class="dname">{{ s.name }}</span>
-                        @if (s.description) {
-                          <p
-                            class="muted"
-                            style="font-size: 0.85em; margin: 0.15em 0 0"
-                          >
-                            {{ s.description }}
-                          </p>
-                        }
-                      </div>
-                      <span class="ddist" style="white-space: nowrap"
-                        >{{ s.lat | number: "1.4-4" }},
-                        {{ s.lon | number: "1.4-4" }}</span
-                      >
-                    </div>
-                  }
-                </div>
-              </div>
-              <p class="src-line mt5">
-                Source:
-                <a
-                  href="https://www.google.com/maps/d/u/0/viewer?mid=1fRAxrc0b1Wng0PRe3d9x9mzQD6s"
-                  target="_blank"
-                  rel="noreferrer"
-                  >Texas Statewide Siren Map</a
-                >.
-              </p>
-            </div>
-          }
-        }
+        <app-infra-tab [cityName]="cityName()" [city]="city()" />
+      </section>
+      <section class="tabpanel" [class.active]="activeTab() === 'energy'">
+        <app-energy-tab [cityName]="cityName()" />
       </section>
     </div>
   </main>

@@ -10,6 +10,8 @@ Hosted at https://texas.lizard.fun
 - Weather reports and history: [Open-Meteo](https://open-meteo.com/)
 - Weather alerts: [National Weather Service](https://www.weather.gov/alerts)
 - Reservoir fullness: [Water Data For Texas](https://www.waterdatafortexas.org/)
+- Warning siren locations: [Texas Statewide Siren Map](https://www.google.com/maps/d/u/0/viewer?mid=1fRAxrc0b1Wng0PRe3d9x9mzQD6s)
+- Electricity usage forcasts: [GridStatus.io](https://www.gridstatus.io/live)
 
 ## Static datasets used from the following sources
 
