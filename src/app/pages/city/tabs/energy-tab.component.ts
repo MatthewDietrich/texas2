@@ -28,6 +28,11 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
         font-size: 13px;
         white-space: nowrap;
       }
+      .mw-vals {
+        display: flex;
+        gap: var(--s4);
+        font-variant-numeric: tabular-nums;
+      }
       .unit {
         color: var(--text-muted);
         font-size: 12px;
@@ -61,7 +66,7 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
                   <span class="fc-day" style="width: 4rem">
                     {{ f.intervalStart | date: "h a" : "America/Chicago" }}
                   </span>
-                  <span class="fc-temps">
+                  <span class="mw-vals">
                     @if (f.zoneMW != null) {
                       <span
                         >{{ f.zoneMW | number }}
