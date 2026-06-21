@@ -57,11 +57,6 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
                   <span class="fc-day" style="width: 4rem">
                     {{ f.intervalStart | date: "h a" : "America/Chicago" }}
                   </span>
-                  <span
-                    class="fc-bar"
-                    style="margin-left: 0"
-                    [style.width.%]="loadBarWidth(f.systemMW, e.loadForecast)"
-                  ></span>
                   <span class="fc-temps">
                     @if (f.zoneMW != null) {
                       <span
