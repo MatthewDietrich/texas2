@@ -55,7 +55,7 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
               @for (f of e.loadForecast; track f.intervalStart) {
                 <div class="fc-row">
                   <span class="fc-day" style="width: 4rem">
-                    {{ f.intervalStart | date: "h a" : "UTC" }}
+                    {{ f.intervalStart | date: "h a" : "America/Chicago" }}
                   </span>
                   <span
                     class="fc-bar"
