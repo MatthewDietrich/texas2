@@ -6,14 +6,10 @@ import { fetchLoadForecast, type LoadForecastRecord } from "../gridstatus";
 
 export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const now = new Date();
-  const end = new Date(now.getTime() + 4 * 60 * 60 * 1000);
 
-  // Format matches GridStatus's stored format ("2026-06-20T15:00:00+00:00")
-  const toGS = (d: Date) => d.toISOString().slice(0, 19) + "+00:00";
-
+  // Sort by most recently published first — latest publishes are always for upcoming intervals
   const records = await fetchLoadForecast({
-    start: toGS(now),
-    end: toGS(end),
+    sort: "-publish_time_utc",
     limit: "20",
   });
 
