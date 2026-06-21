@@ -14,7 +14,9 @@
           <p class="muted mt4">Loading…</p>
         }
         @if (cityError()) {
-          <p class="muted mt4" style="color: var(--accent)">{{ cityError() }}</p>
+          <p class="muted mt4" style="color: var(--accent)">
+            {{ cityError() }}
+          </p>
         }
         @if (city(); as c) {
           <div class="statrow mt5">
@@ -51,28 +53,54 @@
 
     <div class="tabbar">
       <div class="segtabs" role="tablist">
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'snap'" (click)="activeTab.set('snap')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'snap'"
+          (click)="activeTab.set('snap')"
+        >
           <svg class="ic"><use href="#i-camera"></use></svg> Snapshots
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'weather'" (click)="activeTab.set('weather')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'weather'"
+          (click)="activeTab.set('weather')"
+        >
           <svg class="ic"><use href="#i-cloud"></use></svg> Weather
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'water'" (click)="activeTab.set('water')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'water'"
+          (click)="activeTab.set('water')"
+        >
           <svg class="ic"><use href="#i-droplet"></use></svg> Water
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'infra'" (click)="activeTab.set('infra')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'infra'"
+          (click)="activeTab.set('infra')"
+        >
           <svg class="ic"><use href="#i-car"></use></svg> Infrastructure
         </button>
-        <button class="segtab" [attr.aria-selected]="activeTab() === 'energy'" (click)="activeTab.set('energy')">
+        <button
+          class="segtab"
+          [attr.aria-selected]="activeTab() === 'energy'"
+          (click)="activeTab.set('energy')"
+        >
           <svg class="ic"><use href="#i-zap"></use></svg> Electricity
         </button>
       </div>
       @if (weather()?.alerts?.length) {
         @for (a of weather()!.alerts; track a.id) {
-          <span class="alert"><svg class="ic"><use href="#i-alert"></use></svg> {{ a.event }}</span>
+          <span class="alert"
+            ><svg class="ic"><use href="#i-alert"></use></svg>
+            {{ a.event }}</span
+          >
         }
       } @else {
-        <span class="alert calm"><svg class="ic"><use href="#i-check"></use></svg> No active weather alerts</span>
+        <span class="alert calm"
+          ><svg class="ic"><use href="#i-check"></use></svg> No active weather
+          alerts</span
+        >
       }
     </div>
 
@@ -111,7 +139,10 @@
     <div class="foot-src">
       <a routerLink="/">← Back to search</a>
       @if (city(); as c) {
-        <span class="subtle">Searched {{ c.timesSearched.toLocaleString() }} times · © Texas City Snapshot</span>
+        <span class="subtle"
+          >Searched {{ c.timesSearched.toLocaleString() }} times · © Texas City
+          Snapshot</span
+        >
       }
     </div>
   </app-footer>

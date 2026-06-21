@@ -45,7 +45,10 @@ const PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
           <article class="cam">
             <div class="cam-thumb">
               @if (cam.snapshot) {
-                <img [src]="'data:image/jpeg;base64,' + cam.snapshot" [alt]="cam.icdId" />
+                <img
+                  [src]="'data:image/jpeg;base64,' + cam.snapshot"
+                  [alt]="cam.icdId"
+                />
               } @else {
                 <div class="cam-unavailable">
                   <svg class="ic"><use href="#i-camera-off"></use></svg>
@@ -54,7 +57,9 @@ const PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
               }
             </div>
             <div class="cam-meta">
-              <a [routerLink]="['/camera', cam.icdId]" class="cam-id">{{ cam.icdId }}</a>
+              <a [routerLink]="['/camera', cam.icdId]" class="cam-id">{{
+                cam.icdId
+              }}</a>
             </div>
           </article>
         }
@@ -62,8 +67,12 @@ const PLACEHOLDERS = Array.from({ length: 8 }, (_, i) => i);
     </div>
     <p class="src-line mt5">
       Camera snapshots from the
-      <a href="https://www.txdot.gov/discover/live-traffic-cameras.html" target="_blank" rel="noreferrer"
-        >Texas Department of Transportation</a>.
+      <a
+        href="https://www.txdot.gov/discover/live-traffic-cameras.html"
+        target="_blank"
+        rel="noreferrer"
+        >Texas Department of Transportation</a
+      >.
     </p>
   `,
 })
@@ -75,7 +84,9 @@ export class SnapTabComponent {
   readonly placeholders = PLACEHOLDERS;
 
   constructor() {
-    effect(() => { this.load(this.cityName()); });
+    effect(() => {
+      this.load(this.cityName());
+    });
   }
 
   private async load(name: string): Promise<void> {

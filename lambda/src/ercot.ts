@@ -90,10 +90,15 @@ async function fetchErcot<T>(
   });
 
   const body = await res.text();
-  console.log(`[ercot] ${endpoint} → ${res.status} (${body.length} bytes):`, body.slice(0, 300));
+  console.log(
+    `[ercot] ${endpoint} → ${res.status} (${body.length} bytes):`,
+    body.slice(0, 300),
+  );
 
   if (!res.ok) {
-    throw new Error(`ERCOT API ${res.status} for ${endpoint}: ${body.slice(0, 200)}`);
+    throw new Error(
+      `ERCOT API ${res.status} for ${endpoint}: ${body.slice(0, 200)}`,
+    );
   }
 
   return JSON.parse(body) as T;

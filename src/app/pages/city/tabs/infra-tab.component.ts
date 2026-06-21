@@ -106,7 +106,10 @@ import type { City } from "../../../../api/cities";
                   <div>
                     <span class="dname">{{ s.name }}</span>
                     @if (s.description) {
-                      <p class="muted" style="font-size: 0.85em; margin: 0.15em 0 0">
+                      <p
+                        class="muted"
+                        style="font-size: 0.85em; margin: 0.15em 0 0"
+                      >
                         {{ s.description }}
                       </p>
                     }
@@ -124,7 +127,8 @@ import type { City } from "../../../../api/cities";
               href="https://www.google.com/maps/d/u/0/viewer?mid=1fRAxrc0b1Wng0PRe3d9x9mzQD6s"
               target="_blank"
               rel="noreferrer"
-              >Texas Statewide Siren Map</a>.
+              >Texas Statewide Siren Map</a
+            >.
           </p>
         </div>
       }
@@ -139,7 +143,9 @@ export class InfraTabComponent {
   transError = signal<string | null>(null);
 
   constructor() {
-    effect(() => { this.load(this.cityName()); });
+    effect(() => {
+      this.load(this.cityName());
+    });
   }
 
   private async load(name: string): Promise<void> {
@@ -148,7 +154,9 @@ export class InfraTabComponent {
     try {
       this.transportation.set(await getTransportation(name));
     } catch (err) {
-      this.transError.set(err instanceof Error ? err.message : "Request failed");
+      this.transError.set(
+        err instanceof Error ? err.message : "Request failed",
+      );
     } finally {
       this.transLoading.set(false);
     }

@@ -162,7 +162,9 @@ export class CityComponent {
     try {
       this.weather.set(await getWeather(name));
     } catch (err) {
-      this.weatherError.set(err instanceof Error ? err.message : "Request failed");
+      this.weatherError.set(
+        err instanceof Error ? err.message : "Request failed",
+      );
     } finally {
       this.weatherLoading.set(false);
     }

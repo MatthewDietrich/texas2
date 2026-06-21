@@ -34,7 +34,10 @@ export const getEnergyForCity: RouteHandler = async ({ params, origin }) => {
       .collection(Collections.ercotLoadForecast)
       .find(
         { _fetchedAt: { $gte: fiveHoursAgo } },
-        { projection: { _id: 0, _fetchedAt: 0 }, sort: { interval_start_utc: -1 } },
+        {
+          projection: { _id: 0, _fetchedAt: 0 },
+          sort: { interval_start_utc: -1 },
+        },
       )
       .limit(4)
       .toArray()

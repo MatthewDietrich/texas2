@@ -43,7 +43,9 @@ import type { Weather, WeatherDay } from "../../../../api/weather";
         <div class="card card-pad mb5">
           <div class="now-card">
             <div class="now-temp">
-              <span class="wi">{{ wmoIcon(w.current.weatherCode, w.current.isDay) }}</span>
+              <span class="wi">{{
+                wmoIcon(w.current.weatherCode, w.current.isDay)
+              }}</span>
               <div>
                 <div class="deg">{{ w.current.tempF }}°</div>
                 <div class="cond">
@@ -62,19 +64,26 @@ import type { Weather, WeatherDay } from "../../../../api/weather";
                 <span class="v">{{ w.current.precipProbability }}%</span>
               </div>
               <div class="metric">
-                <span class="k"><span class="wi">&#xf041;</span> Cloud cover</span>
+                <span class="k"
+                  ><span class="wi">&#xf041;</span> Cloud cover</span
+                >
                 <span class="v">{{ w.current.cloudCover }}%</span>
               </div>
               <div class="metric">
                 <span class="k"><span class="wi">&#xf050;</span> Wind</span>
-                <span class="v">{{ w.current.windMph }} mph {{ windDirLabel(w.current.windDir) }}</span>
+                <span class="v"
+                  >{{ w.current.windMph }} mph
+                  {{ windDirLabel(w.current.windDir) }}</span
+                >
               </div>
               <div class="metric">
                 <span class="k"><span class="wi">&#xf079;</span> Pressure</span>
                 <span class="v">{{ w.current.pressureMb }} mb</span>
               </div>
               <div class="metric">
-                <span class="k"><span class="wi">&#xf055;</span> Dew point</span>
+                <span class="k"
+                  ><span class="wi">&#xf055;</span> Dew point</span
+                >
                 <span class="v">{{ w.current.dewPointF }}°</span>
               </div>
             </div>
@@ -102,9 +111,11 @@ import type { Weather, WeatherDay } from "../../../../api/weather";
                   <div class="fc-row">
                     <span class="fc-day">{{ dayLabel(f.date, i) }}</span>
                     <span class="wi">{{ wmoIcon(f.weatherCode, true) }}</span>
-                    <span class="fc-bar"
+                    <span
+                      class="fc-bar"
                       [style.margin-left.%]="barLeft(f)"
-                      [style.width.%]="barWidth(f)"></span>
+                      [style.width.%]="barWidth(f)"
+                    ></span>
                     <span class="fc-temps">
                       <span>{{ f.highF }}°</span>
                       <span class="lo">{{ f.lowF }}°</span>
@@ -129,21 +140,39 @@ import type { Weather, WeatherDay } from "../../../../api/weather";
                 <tbody>
                   <tr>
                     <td>High</td>
-                    <td class="num">{{ w.almanac.yr1 ? w.almanac.yr1.highF + "°" : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr5 ? w.almanac.yr5.highF + "°" : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr10 ? w.almanac.yr10.highF + "°" : "—" }}</td>
+                    <td class="num">
+                      {{ w.almanac.yr1 ? w.almanac.yr1.highF + "°" : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr5 ? w.almanac.yr5.highF + "°" : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr10 ? w.almanac.yr10.highF + "°" : "—" }}
+                    </td>
                   </tr>
                   <tr>
                     <td>Low</td>
-                    <td class="num">{{ w.almanac.yr1 ? w.almanac.yr1.lowF + "°" : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr5 ? w.almanac.yr5.lowF + "°" : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr10 ? w.almanac.yr10.lowF + "°" : "—" }}</td>
+                    <td class="num">
+                      {{ w.almanac.yr1 ? w.almanac.yr1.lowF + "°" : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr5 ? w.almanac.yr5.lowF + "°" : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr10 ? w.almanac.yr10.lowF + "°" : "—" }}
+                    </td>
                   </tr>
                   <tr>
                     <td>Precip.</td>
-                    <td class="num">{{ w.almanac.yr1 ? w.almanac.yr1.precipIn + '"' : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr5 ? w.almanac.yr5.precipIn + '"' : "—" }}</td>
-                    <td class="num">{{ w.almanac.yr10 ? w.almanac.yr10.precipIn + '"' : "—" }}</td>
+                    <td class="num">
+                      {{ w.almanac.yr1 ? w.almanac.yr1.precipIn + '"' : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr5 ? w.almanac.yr5.precipIn + '"' : "—" }}
+                    </td>
+                    <td class="num">
+                      {{ w.almanac.yr10 ? w.almanac.yr10.precipIn + '"' : "—" }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -154,9 +183,13 @@ import type { Weather, WeatherDay } from "../../../../api/weather";
     }
     <p class="src-line mt5">
       Forecasts by
-      <a href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>
+      <a href="https://open-meteo.com" target="_blank" rel="noreferrer"
+        >Open-Meteo</a
+      >
       · Alerts by the
-      <a href="https://weather.gov/alerts" target="_blank" rel="noreferrer">National Weather Service</a>.
+      <a href="https://weather.gov/alerts" target="_blank" rel="noreferrer"
+        >National Weather Service</a
+      >.
     </p>
   `,
 })
@@ -209,7 +242,13 @@ export class WeatherTabComponent {
   hourLabel(time: string, i: number): string {
     if (i === 0) return "Now";
     const h = parseInt(time.slice(11, 13), 10);
-    return h === 0 ? "12am" : h < 12 ? `${h}am` : h === 12 ? "12pm" : `${h - 12}pm`;
+    return h === 0
+      ? "12am"
+      : h < 12
+        ? `${h}am`
+        : h === 12
+          ? "12pm"
+          : `${h - 12}pm`;
   }
 
   dayLabel(date: string, i: number): string {
@@ -219,7 +258,9 @@ export class WeatherTabComponent {
   }
 
   windDirLabel(deg: number): string {
-    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(deg / 45) % 8];
+    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][
+      Math.round(deg / 45) % 8
+    ];
   }
 
   barLeft(day: WeatherDay): number {

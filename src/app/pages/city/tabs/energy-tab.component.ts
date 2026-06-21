@@ -48,15 +48,8 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
       <p class="muted mt4">No ERCOT data available for this location.</p>
     } @else {
       @if (energy(); as e) {
-        <div class="card card-pad mb5" style="max-width: 320px">
-          <div class="drow" style="border-bottom: none; padding-top: 0">
-            <span class="dname">ERCOT load zone</span>
-            <span class="ddist mono">{{ e.loadZone }}</span>
-          </div>
-        </div>
-
         @if (e.loadForecast.length) {
-          <h3 class="card-title mb4">Upcoming load forecast</h3>
+          <h3 class="card-title mb4">Zone-wide load forecast</h3>
           <div class="card card-pad">
             <div class="forecast">
               @for (f of e.loadForecast; track f.intervalStart) {
@@ -71,23 +64,35 @@ import type { Energy, LoadForecastHour } from "../../../../api/energy";
                   ></span>
                   <span class="fc-temps">
                     @if (f.zoneMW != null) {
-                      <span>{{ f.zoneMW | number }} <span class="lo">MW zone</span></span>
+                      <span
+                        >{{ f.zoneMW | number }}
+                        <span class="lo">MW zone</span></span
+                      >
                     }
-                    <span>{{ f.systemMW | number }} <span class="lo">MW system</span></span>
+                    <span
+                      >{{ f.systemMW | number }}
+                      <span class="lo">MW system</span></span
+                    >
                   </span>
                 </div>
               }
             </div>
           </div>
         } @else {
-          <p class="muted mt4"><em>No load forecast data yet — check back shortly.</em></p>
+          <p class="muted mt4">
+            <em>No load forecast data yet — check back shortly.</em>
+          </p>
         }
 
         <p class="src-line mt5">
           Forecasts via
-          <a href="https://gridstatus.io" target="_blank" rel="noreferrer">GridStatus.io</a>
+          <a href="https://gridstatus.io" target="_blank" rel="noreferrer"
+            >GridStatus.io</a
+          >
           · data from
-          <a href="https://www.ercot.com" target="_blank" rel="noreferrer">ERCOT</a>.
+          <a href="https://www.ercot.com" target="_blank" rel="noreferrer"
+            >ERCOT</a
+          >.
         </p>
       }
     }
@@ -100,7 +105,9 @@ export class EnergyTabComponent {
   energyError = signal<string | null>(null);
 
   constructor() {
-    effect(() => { this.load(this.cityName()); });
+    effect(() => {
+      this.load(this.cityName());
+    });
   }
 
   private async load(name: string): Promise<void> {
@@ -109,7 +116,9 @@ export class EnergyTabComponent {
     try {
       this.energy.set(await getEnergy(name));
     } catch (err) {
-      this.energyError.set(err instanceof Error ? err.message : "Request failed");
+      this.energyError.set(
+        err instanceof Error ? err.message : "Request failed",
+      );
     } finally {
       this.energyLoading.set(false);
     }

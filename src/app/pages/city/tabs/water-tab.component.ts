@@ -35,11 +35,18 @@ import type { City } from "../../../../api/cities";
                   }
                 </div>
                 <span class="res-pct">
-                  @if (r.percentFull != null) { {{ r.percentFull }}% } @else { — }
+                  @if (r.percentFull != null) {
+                    {{ r.percentFull }}%
+                  } @else {
+                    —
+                  }
                 </span>
               </div>
               <div class="res-track">
-                <div class="res-fill" [style.width.%]="r.percentFull ?? 0"></div>
+                <div
+                  class="res-fill"
+                  [style.width.%]="r.percentFull ?? 0"
+                ></div>
               </div>
             </div>
           }
@@ -50,7 +57,9 @@ import type { City } from "../../../../api/cities";
     }
     <p class="src-line mt5">
       Source:
-      <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer">Water Data for Texas</a>.
+      <a href="https://waterdatafortexas.org" target="_blank" rel="noreferrer"
+        >Water Data for Texas</a
+      >.
     </p>
   `,
 })
