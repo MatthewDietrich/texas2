@@ -8,11 +8,16 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const now = new Date();
   const end = new Date(now.getTime() + 4 * 60 * 60 * 1000);
 
+  // Format matches GridStatus's stored format ("2026-06-20T15:00:00+00:00")
+  const toGS = (d: Date) => d.toISOString().slice(0, 19) + "+00:00";
+
   const records = await fetchLoadForecast({
-    start: now.toISOString(),
-    end: end.toISOString(),
-    limit: "20", // fetch extra to deduplicate multiple publishes per interval
+    start: toGS(now),
+    end: toGS(end),
+    limit: "20",
   });
+
+  console.log(`[loadForecast] GridStatus returned ${records.length} records`);
 
   // Deduplicate: keep one record per interval start time
   const seen = new Map<string, LoadForecastRecord>();
