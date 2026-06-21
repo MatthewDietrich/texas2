@@ -12,8 +12,10 @@ export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const toGS = (d: Date) => d.toISOString().slice(0, 19) + "+00:00";
 
   const records = await fetchLoadForecast({
-    start: toGS(startOfHour),
-    end: toGS(end),
+    start_time: toGS(startOfHour),
+    end_time: toGS(end),
+    publish_time: "latest",
+    timezone: "market",
     limit: "20",
   });
 
