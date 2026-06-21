@@ -6,11 +6,13 @@ import { fetchLoadForecast, type LoadForecastRecord } from "../gridstatus";
 
 export const refreshLoadForecast: RouteHandler = async ({ origin }) => {
   const now = new Date();
-  const end = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  const startOfHour = new Date(now);
+  startOfHour.setMinutes(0, 0, 0);
+  const end = new Date(startOfHour.getTime() + 4 * 60 * 60 * 1000);
   const toGS = (d: Date) => d.toISOString().slice(0, 19) + "+00:00";
 
   const records = await fetchLoadForecast({
-    start: toGS(now),
+    start: toGS(startOfHour),
     end: toGS(end),
     limit: "20",
   });
