@@ -26,6 +26,7 @@ export async function fetchLoadForecast(
     url.searchParams.set(k, v);
   }
 
+  console.log("[gridstatus] GET", url.toString());
   const res = await fetch(url.toString(), {
     headers: { "X-Api-Key": getApiKey() },
     signal: AbortSignal.timeout(15_000),
