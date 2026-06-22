@@ -49,11 +49,65 @@ interface ArcGisQueryResponse {
 const WELLS_QUERY_URL =
   "https://gis.rrc.texas.gov/server/rest/services/RRC_Public/Wells/MapServer/0/query";
 
+const TOKEN_URL =
+  "https://gis.rrc.texas.gov/server/tokens/generateToken";
+
 const PAGE_SIZE = 2000;
 
 const API_FIELD = "API";
 
 const OUT_FIELDS = ["API", "LEASE_NAME", "OPERATOR_NO", "WELL_NO"];
+
+// ---------------------------------------------------------------------------
+// Token management
+// ---------------------------------------------------------------------------
+
+interface TokenCache {
+  value: string;
+  expiresAt: number;
+}
+
+let tokenCache: TokenCache | null = null;
+
+async function getToken(): Promise<string> {
+  // Refresh 60 s before expiry so in-flight requests don't race the cutoff
+  if (tokenCache && Date.now() < tokenCache.expiresAt - 60_000) {
+    return tokenCache.value;
+  }
+
+  const body = new URLSearchParams({
+    f: "json",
+    client: "requestip",
+    expiration: "120", // minutes
+  });
+
+  const res = await fetch(TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+
+  if (!res.ok) throw new Error(`RRC token request failed: HTTP ${res.status}`);
+
+  const data = (await res.json()) as {
+    token?: string;
+    expires?: number;
+    error?: { code: number; message: string };
+  };
+
+  if (data.error) {
+    throw new Error(`RRC token error ${data.error.code}: ${data.error.message}`);
+  }
+  if (!data.token) throw new Error("RRC token response missing token field");
+
+  tokenCache = {
+    value: data.token,
+    // ArcGIS returns `expires` as a Unix ms timestamp
+    expiresAt: data.expires ?? Date.now() + 120 * 60 * 1000,
+  };
+
+  return tokenCache.value;
+}
 
 // ---------------------------------------------------------------------------
 // Geometry helpers
@@ -85,9 +139,13 @@ function toEsriPolygon(geojsonRings: Ring[]): EsriPolygon {
 async function fetchWellsPage(
   polygon: EsriPolygon,
   offset: number,
+  retrying = false,
 ): Promise<ArcGisQueryResponse> {
+  const token = await getToken();
+
   const body = new URLSearchParams({
     f: "json",
+    token,
     geometry: JSON.stringify(polygon),
     geometryType: "esriGeometryPolygon",
     inSR: "4326",
@@ -112,6 +170,11 @@ async function fetchWellsPage(
   const data = (await res.json()) as ArcGisQueryResponse;
 
   if (data.error) {
+    // 499 = token expired/invalid — clear cache and retry once
+    if (data.error.code === 499 && !retrying) {
+      tokenCache = null;
+      return fetchWellsPage(polygon, offset, true);
+    }
     throw new Error(`RRC query error ${data.error.code}: ${data.error.message}`);
   }
 
