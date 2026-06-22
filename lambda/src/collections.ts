@@ -7,6 +7,7 @@ export const Collections = {
   district: "district",
   highway: "highway",
   reservoir: "reservoir",
+  rrcWell: "rrc_well",
   siren: "siren",
   ercotLoadForecast: "ercot_load_forecast",
 } as const;
