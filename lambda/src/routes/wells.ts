@@ -39,8 +39,6 @@ function makeMongoStore(db: Db): StatusStore {
 
 /** GET /cities/:name/wells */
 export const getWellsForCity: RouteHandler = async ({ params, origin }) => {
-  const tag = `[wells:${params.name}]`;
-
   const db = await getDb();
   const city = await db.collection(Collections.city).findOne(
     { "properties.name": params.name },
@@ -50,22 +48,14 @@ export const getWellsForCity: RouteHandler = async ({ params, origin }) => {
     },
   );
 
-  if (!city) {
-    console.warn(`${tag} city not found`);
-    return notFound(`No city found with name "${params.name}"`, origin);
-  }
+  if (!city) return notFound(`No city found with name "${params.name}"`, origin);
 
   const geo = city.geometry as
     | { type: "Polygon"; coordinates: [number, number][][] }
     | { type: "MultiPolygon"; coordinates: [number, number][][][] }
     | null;
 
-  if (!geo) {
-    console.warn(`${tag} city has no boundary geometry`);
-    return notFound(`No boundary geometry for "${params.name}"`, origin);
-  }
-
-  console.log(`${tag} geometry type=${geo.type}`);
+  if (!geo) return notFound(`No boundary geometry for "${params.name}"`, origin);
 
   const rings: [number, number][][] =
     geo.type === "Polygon"
@@ -74,12 +64,9 @@ export const getWellsForCity: RouteHandler = async ({ params, origin }) => {
 
   let wellPoints: WellPoint[];
   if (isCacheFresh(city)) {
-    console.log(`${tag} cache hit, ${(city.wellsPoints as WellPoint[]).length} points`);
     wellPoints = city.wellsPoints as WellPoint[];
   } else {
-    console.log(`${tag} cache miss, querying RRC`);
     wellPoints = await fetchWellsInPolygon(rings);
-    console.log(`${tag} RRC returned ${wellPoints.length} wells, writing cache`);
     await db.collection(Collections.city).updateOne(
       { "properties.name": params.name },
       { $set: { wellsPoints: wellPoints, wellsPointsCachedAt: new Date().toISOString() } },
@@ -87,8 +74,6 @@ export const getWellsForCity: RouteHandler = async ({ params, origin }) => {
     );
   }
 
-  console.log(`${tag} enriching ${wellPoints.length} wells from MongoDB`);
   const wells = await enrichWithStatus(wellPoints, makeMongoStore(db));
-  console.log(`${tag} done, ${wells.filter(w => w.status).length}/${wells.length} wells have status`);
   return ok(wells, origin, 3600);
 };
